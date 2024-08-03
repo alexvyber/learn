@@ -1,0 +1,4 @@
+- push state down and encaapsulate it with the only code that cares about it
+- push everything down that could trigger expensive components on the same level
+- push shit down first. Wrap with memo when pushing state down isn't enough
+- children is the same as slots in other frameworks. Children is the place where parent can render its component inside child's real estate kinda thing

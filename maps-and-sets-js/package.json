@@ -1,0 +1,16 @@
+{
+  "name": "maps_and_sets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/plugin-proposal-pipeline-operator": "^7.18.9",
+    "typescript": "^4.9.3"
+  }
+}

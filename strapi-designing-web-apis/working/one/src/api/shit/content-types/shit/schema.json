@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "shits",
+  "info": {
+    "singularName": "shit",
+    "pluralName": "shits",
+    "displayName": "Shit"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Pidoras": {
+      "type": "string"
+    }
+  }
+}

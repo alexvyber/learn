@@ -1,0 +1,3 @@
+[submodule "coffeemasters-authn"]
+	path = coffeemasters-authn
+	url = https://github.com/firtman/coffeemasters-authn.git

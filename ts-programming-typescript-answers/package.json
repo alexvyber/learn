@@ -1,0 +1,19 @@
+{
+  "name": "programming-typescript-answers",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint -p .",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "dependencies": {
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "prettier": "^2.8.4",
+    "tslint-config-prettier": "^1.18.0"
+  }
+}

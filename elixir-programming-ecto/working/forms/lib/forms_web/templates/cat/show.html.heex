@@ -1,0 +1,18 @@
+<h1>Show Cat</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @cat.name %>
+  </li>
+
+  <li>
+    <strong>Age:</strong>
+    <%= @cat.age %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.cat_path(@conn, :edit, @cat) %></span> |
+<span><%= link "Back", to: Routes.cat_path(@conn, :index) %></span>

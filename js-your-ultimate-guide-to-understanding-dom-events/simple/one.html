@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <h2>Parent</h2>
+
+      <div>
+        <h2>Child</h2>
+        <button onclick="console.log(this, event)">BUTTON</button>
+        <button onclick="more()">BUTTON 2</button>
+        <button onclick="onClick()">CLICK 2</button>
+      </div>
+    </div>
+    <script>
+      function execute(event) {
+        eval("console.log(this,event)");
+      }
+
+      execute.call(document.querySelector("button"), {
+        type: "fake evenet",
+      });
+
+      function more() {
+        execute.call(document.querySelector("button"), {
+          type: "fake evenet call",
+        });
+      }
+
+      function onClick() {
+        console.log("onClick");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+[submodule "source"]
+	path = source
+	url = https://github.com/robertguss/Udemy-Understanding-Astro-and-its-ecosystem.git
+[submodule "blog-source"]
+	path = blog-source
+	url = https://github.com/robertguss/Udemy-Astro-Blog-Project.git

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <h2>Parent</h2>
+
+      <div>
+        <h2>Child</h2>
+        <button>BUTTON</button>
+      </div>
+    </div>
+    <script>
+      const button = document.querySelector("button");
+
+      function onClick(evenet) {
+        console.log("🚀 ~ onClick:", evenet);
+      }
+
+      const listener = {
+        handleEvent: function onClick(event) {
+          console.log("🚀 ~ handleEvent:", event);
+        },
+      };
+      // button.addEventListener("click", () => {});
+      // button.addEventListener("click", onClick);
+      button.addEventListener("click", listener);
+    </script>
+  </body>
+</html>

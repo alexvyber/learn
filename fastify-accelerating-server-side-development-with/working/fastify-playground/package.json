@@ -1,0 +1,16 @@
+{
+  "name": "fastify-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^4.19.2",
+    "pino-pretty": "^10.1.0"
+  }
+}
