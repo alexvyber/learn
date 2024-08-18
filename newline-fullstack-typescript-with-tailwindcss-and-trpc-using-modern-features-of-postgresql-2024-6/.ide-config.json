@@ -1,0 +1,30 @@
+{
+  "packages": ["nodejs"],
+  "apps": [
+    {
+      "name": "frontend",
+      "type": "frontend",
+      "port": 3002,
+      "scripts": [
+        {
+          "scope": "install",
+          "content": "npm install"
+        },
+        {
+          "scope": "run",
+          "content": "npm run dev-frontend"
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "port": 3003,
+      "scripts": [
+        {
+          "scope": "run",
+          "content": "npm run dev-backend"
+        }
+      ]
+    }
+  ]
+}

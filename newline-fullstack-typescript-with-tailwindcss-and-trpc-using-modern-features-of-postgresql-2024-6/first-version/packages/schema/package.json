@@ -1,0 +1,21 @@
+{
+  "name": "@easybooking/schema",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "generate-models": "knex migrate:latest && schemalint && kanel && tsc"
+  },
+  "dependencies": {
+    "knex": "^2.5.0",
+    "pg": "^8.11.1",
+    "postgres-range": "^1.1.3"
+  },
+  "devDependencies": {
+    "kanel": "^3.4.0",
+    "kanel-knex": "^2.2.0",
+    "kanel-zod": "^1.2.1",
+    "schemalint": "^1.0.3"
+  }
+}

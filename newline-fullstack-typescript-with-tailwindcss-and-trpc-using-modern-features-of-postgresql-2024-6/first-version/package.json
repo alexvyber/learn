@@ -1,0 +1,32 @@
+{
+  "name": "easybooking-monorepo",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "private": true,
+  "workspaces": [
+    "packages/schema",
+    "services/backend",
+    "services/frontend"
+  ],
+  "scripts": {
+    "start-dev-db": "docker run --name easybooking_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=easybooking -p 5432:5432 -d postgres",
+    "build-schema": "npm run --prefix ./packages/schema build",
+    "generate-models": "npm run --prefix ./packages/schema generate-models",
+    "dev-backend": "npm run build-schema && npm run generate-models && npm run --prefix ./services/backend dev",
+    "dev-frontend": "npm run --prefix ./services/frontend dev",
+    "dev": "npm run dev-backend & npm run dev-frontend --clearScreen false",
+    "devv": "tmux new-session -d -s easybooking 'npm run dev-backend' \\; split-window -v 'npm run dev-frontend' \\; attach-session -t easybooking",
+    "devh": "tmux new-session -d -s easybooking 'npm run dev-backend' \\; split-window -h 'npm run dev-frontend' \\; attach-session -t easybooking",
+    "lint": "eslint . -f visualstudio --report-unused-disable-directives --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@tsconfig/recommended": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6"
+  }
+}

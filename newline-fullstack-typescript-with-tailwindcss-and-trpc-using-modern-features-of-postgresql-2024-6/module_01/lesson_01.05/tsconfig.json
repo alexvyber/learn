@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./packages" /* Specify the base directory to resolve non-relative module names. */,
+    "paths": {
+      /* Specify a set of entries that re-map imports to additional lookup locations. */
+      "@easybooking/schema": ["packages/schema"]
+    }
+  }
+}

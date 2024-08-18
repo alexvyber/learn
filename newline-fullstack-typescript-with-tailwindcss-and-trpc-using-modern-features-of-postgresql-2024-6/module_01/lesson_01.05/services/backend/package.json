@@ -1,0 +1,9 @@
+{
+  "name": "@easybooking/backend",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "private": false,
+  "dependencies": {
+    "@easybooking/schema": "*"
+  }
+}

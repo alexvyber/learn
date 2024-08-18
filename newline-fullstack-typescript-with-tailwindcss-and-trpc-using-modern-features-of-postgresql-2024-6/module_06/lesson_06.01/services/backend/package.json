@@ -1,0 +1,33 @@
+{
+  "name": "@easybooking/backend",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "private": false,
+  "scripts": {
+    "dev": "nodemon src/index.ts",  
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@easybooking/schema": "*",
+    "@koa/router": "^12.0.1",
+    "@trpc/server": "^10.45.2",
+    "knex": "^3.1.0",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-helmet": "^7.0.2",
+    "koa-logger": "^3.2.1",
+    "superjson": "^1.13.3",
+    "trpc-koa-adapter": "^1.2.1",
+    "zod": "^3.23.6"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa__router": "^12.0.4",
+    "@types/koa-logger": "^3.1.5",
+    "@types/node": "^20.12.7",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

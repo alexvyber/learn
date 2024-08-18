@@ -1,0 +1,24 @@
+{
+  "name": "@easybooking/schema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-models": "schemalint && kanel && tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "knex": "^3.1.0",
+    "pg": "^8.11.5",
+    "postgres-range": "^1.1.4"
+  },
+  "devDependencies": {
+    "kanel": "^3.8.8",
+    "kanel-knex": "^2.3.4",
+    "kanel-zod": "^1.3.4",
+    "schemalint": "^2.0.0"
+  }
+}
