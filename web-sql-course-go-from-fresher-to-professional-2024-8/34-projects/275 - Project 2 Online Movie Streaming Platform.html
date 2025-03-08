@@ -1,0 +1,374 @@
+<h4><strong>Project: Online Movie Streaming Platform</strong></h4><p><br></p><h4><strong>1. Project Overview</strong></h4><p>The goal of this project is to build a relational database for an online movie streaming platform where users can register, subscribe to plans, watch movies, rate them, and provide reviews. The database will support the following functionalities:</p><ul><li><p>User management: Registering new users, managing user details.</p></li><li><p>Movie catalog: Managing information about movies, genres, directors, actors, etc.</p></li><li><p>Subscription plans: Handling various subscription types (monthly, yearly, etc.).</p></li><li><p>Viewing history: Tracking which movies users have watched.</p></li><li><p>Ratings and reviews: Allowing users to rate movies and provide written reviews.</p></li></ul><p><br></p><h4><strong>2. Database Schema Design</strong></h4><p>The database will contain the following tables:</p><ol><li><p><strong>Users</strong>: Information about the users.</p></li><li><p><strong>Movies</strong>: Details of movies available on the platform.</p></li><li><p><strong>Genres</strong>: Different genres of movies.</p></li><li><p><strong>Directors</strong>: Information about movie directors.</p></li><li><p><strong>Actors</strong>: Information about actors involved in movies.</p></li><li><p><strong>Movie_Actors</strong>: Relationship table between movies and actors.</p></li><li><p><strong>Subscriptions</strong>: Details of subscription plans.</p></li><li><p><strong>User_Subscriptions</strong>: Relationship table between users and their subscriptions.</p></li><li><p><strong>Viewing_History</strong>: Tracks which movies users have watched.</p></li><li><p><strong>Ratings</strong>: Stores users' ratings for movies.</p></li><li><p><strong>Reviews</strong>: Stores user reviews for movies.</p></li></ol><p><br></p><h4><strong>3. Table Structure and SQL Queries</strong></h4><p>Let's define the structure of each table and the associated SQL queries to create them:</p><h4><strong>1. Users Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+</pre><p><br></p><h4><strong>2. Movies Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Movies (
+    movie_id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    release_year INT,
+    duration INT,  -- Duration in minutes
+    director_id INT,
+    genre_id INT,
+    FOREIGN KEY (director_id) REFERENCES Directors(director_id),
+    FOREIGN KEY (genre_id) REFERENCES Genres(genre_id)
+);
+</pre><p><br></p><h4><strong>3. Genres Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Genres (
+    genre_id INT PRIMARY KEY AUTO_INCREMENT,
+    genre_name VARCHAR(50) NOT NULL UNIQUE
+);
+</pre><p><br></p><h4><strong>4. Directors Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Directors (
+    director_id INT PRIMARY KEY AUTO_INCREMENT,
+    director_name VARCHAR(100) NOT NULL
+);
+</pre><p><br></p><h4><strong>5. Actors Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Actors (
+    actor_id INT PRIMARY KEY AUTO_INCREMENT,
+    actor_name VARCHAR(100) NOT NULL
+);
+</pre><p><br></p><h4><strong>6. Movie_Actors Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Movie_Actors (
+    movie_id INT,
+    actor_id INT,
+    PRIMARY KEY (movie_id, actor_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id),
+    FOREIGN KEY (actor_id) REFERENCES Actors(actor_id)
+);
+</pre><p><br></p><h4><strong>7. Subscriptions Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Subscriptions (
+    subscription_id INT PRIMARY KEY AUTO_INCREMENT,
+    subscription_type VARCHAR(50) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    duration_months INT NOT NULL
+);
+</pre><p><br></p><h4><strong>8. User_Subscriptions Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE User_Subscriptions (
+    user_id INT,
+    subscription_id INT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    PRIMARY KEY (user_id, subscription_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (subscription_id) REFERENCES Subscriptions(subscription_id)
+);
+</pre><p><br></p><h4><strong>9. Viewing_History Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Viewing_History (
+    history_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    watch_date DATE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+</pre><p><br></p><h4><strong>10. Ratings Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Ratings (
+    rating_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    rating INT CHECK(rating &gt;= 1 AND rating &lt;= 5),
+    rating_date DATE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+</pre><p><br></p><h4><strong>11. Reviews Table</strong></h4><pre class="prettyprint linenums">CREATE TABLE Reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    movie_id INT,
+    review_text TEXT,
+    review_date DATE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (movie_id) REFERENCES Movies(movie_id)
+);
+</pre><p><br></p><h4><strong>4. Sample Data Insertion</strong></h4><p>Let's insert some sample data into the tables:</p><pre class="prettyprint linenums">-- Insert Genres
+INSERT INTO Genres (genre_name) VALUES ('Action'), ('Comedy'), ('Drama'), ('Horror'), ('Science Fiction');
+
+-- Insert Directors
+INSERT INTO Directors (director_name) VALUES ('Steven Spielberg'), ('Christopher Nolan'), ('James Cameron');
+
+-- Insert Movies
+INSERT INTO Movies (title, release_year, duration, director_id, genre_id) 
+VALUES 
+('Inception', 2010, 148, 2, 5),
+('Jurassic Park', 1993, 127, 1, 1),
+('Titanic', 1997, 195, 3, 3);
+
+-- Insert Actors
+INSERT INTO Actors (actor_name) VALUES ('Leonardo DiCaprio'), ('Joseph Gordon-Levitt'), ('Kate Winslet');
+
+-- Insert Movie Actors
+INSERT INTO Movie_Actors (movie_id, actor_id) 
+VALUES 
+(1, 1), (1, 2), (3, 1), (3, 3);
+
+-- Insert Users
+INSERT INTO Users (username, email, password) 
+VALUES 
+('john_doe', 'john@example.com', 'password123'),
+('jane_smith', 'jane@example.com', 'password456');
+
+-- Insert Subscriptions
+INSERT INTO Subscriptions (subscription_type, price, duration_months) 
+VALUES 
+('Monthly', 9.99, 1), 
+('Yearly', 99.99, 12);
+
+-- Insert User Subscriptions
+INSERT INTO User_Subscriptions (user_id, subscription_id, start_date, end_date) 
+VALUES 
+(1, 1, '2023-01-01', '2023-02-01'), 
+(2, 2, '2023-01-01', '2024-01-01');
+
+-- Insert Viewing History
+INSERT INTO Viewing_History (user_id, movie_id, watch_date) 
+VALUES 
+(1, 1, '2023-01-10'), 
+(2, 2, '2023-01-12');
+
+-- Insert Ratings
+INSERT INTO Ratings (user_id, movie_id, rating, rating_date) 
+VALUES 
+(1, 1, 5, '2023-01-11'), 
+(2, 2, 4, '2023-01-13');
+
+-- Insert Reviews
+INSERT INTO Reviews (user_id, movie_id, review_text, review_date) 
+VALUES 
+(1, 1, 'Amazing movie!', '2023-01-11'), 
+(2, 2, 'Great special effects!', '2023-01-13');
+</pre><p><br></p><h4><strong>5. Sample Queries</strong></h4><p>Here are some sample queries to retrieve and analyze data from the database:</p><p><strong>1. Retrieve all movies with their genres and directors:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    g.genre_name AS Genre, 
+    d.director_name AS Director
+FROM 
+    Movies m
+JOIN 
+    Genres g ON m.genre_id = g.genre_id
+JOIN 
+    Directors d ON m.director_id = d.director_id;
+</pre><p><br></p><p><strong>2. Find all movies watched by a specific user (e.g., </strong><code><strong>john_doe</strong></code><strong>):</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username, 
+    m.title AS Movie_Title, 
+    vh.watch_date
+FROM 
+    Viewing_History vh
+JOIN 
+    Users u ON vh.user_id = u.user_id
+JOIN 
+    Movies m ON vh.movie_id = m.movie_id
+WHERE 
+    u.username = 'john_doe';
+</pre><p><br></p><p><strong>3. Calculate the average rating for each movie:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    AVG(r.rating) AS Average_Rating
+FROM 
+    Ratings r
+JOIN 
+    Movies m ON r.movie_id = m.movie_id
+GROUP BY 
+    m.movie_id, m.title;
+</pre><p><br></p><p><strong>4. List all reviews for a specific movie (e.g., </strong><code><strong>Inception</strong></code><strong>):</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    u.username, 
+    r.review_text, 
+    r.review_date
+FROM 
+    Reviews r
+JOIN 
+    Users u ON r.user_id = u.user_id
+JOIN 
+    Movies m ON r.movie_id = m.movie_id
+WHERE 
+    m.title = 'Inception';
+</pre><p><br></p><p><strong>5. Get the most popular movie based on the number of views:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    COUNT(vh.history_id) AS Number_of_Views
+FROM 
+    Viewing_History vh
+JOIN 
+    Movies m ON vh.movie_id = m.movie_id
+GROUP BY 
+    m.movie_id, m.title
+ORDER BY 
+    Number_of_Views DESC
+LIMIT 1;
+</pre><p><br></p><h4><strong>6. Advanced Queries</strong></h4><p><strong>1. Retrieve users who have not watched any movie:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username 
+FROM 
+    Users u
+LEFT JOIN 
+    Viewing_History vh ON u.user_id = vh.user_id
+WHERE 
+    vh.history_id IS NULL;
+</pre><p><br></p><p><strong>2. Find the most active user based on the number of movies watched:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username, 
+    COUNT(vh.history_id) AS Movies_Watched
+FROM 
+    Users u
+JOIN 
+    Viewing_History vh ON u.user_id = vh.user_id
+GROUP BY 
+    u.user_id, u.username
+ORDER BY 
+    Movies_Watched DESC
+LIMIT 1;</pre><p><br></p><h4><strong>Additional SQL Queries</strong></h4><p><strong>1. Find the highest-rated movie by each user:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username, 
+    m.title AS Movie_Title, 
+    MAX(r.rating) AS Highest_Rating
+FROM 
+    Users u
+JOIN 
+    Ratings r ON u.user_id = r.user_id
+JOIN 
+    Movies m ON r.movie_id = m.movie_id
+GROUP BY 
+    u.user_id, u.username;
+</pre><p><br></p><p><strong>2. List movies with no reviews:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title
+FROM 
+    Movies m
+LEFT JOIN 
+    Reviews r ON m.movie_id = r.movie_id
+WHERE 
+    r.review_id IS NULL;
+</pre><p><br></p><p><strong>3. Find the total revenue generated by each subscription type:</strong></p><pre class="prettyprint linenums">SELECT 
+    s.subscription_type, 
+    SUM(s.price) AS Total_Revenue
+FROM 
+    Subscriptions s
+JOIN 
+    User_Subscriptions us ON s.subscription_id = us.subscription_id
+GROUP BY 
+    s.subscription_type;
+</pre><p><br></p><p><strong>4. Retrieve movies released in a specific year (e.g., 2010):</strong></p><pre class="prettyprint linenums">SELECT 
+    title AS Movie_Title, 
+    release_year
+FROM 
+    Movies
+WHERE 
+    release_year = 2010;
+</pre><p><br></p><p><strong>5. Find all users who have rated all the movies they have watched:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username
+FROM 
+    Users u
+JOIN 
+    Viewing_History vh ON u.user_id = vh.user_id
+LEFT JOIN 
+    Ratings r ON vh.user_id = r.user_id AND vh.movie_id = r.movie_id
+GROUP BY 
+    u.user_id, u.username
+HAVING 
+    COUNT(vh.movie_id) = COUNT(r.movie_id);
+</pre><p><br></p><p><strong>6. List directors with their total number of movies directed:</strong></p><pre class="prettyprint linenums">SELECT 
+    d.director_name, 
+    COUNT(m.movie_id) AS Total_Movies
+FROM 
+    Directors d
+LEFT JOIN 
+    Movies m ON d.director_id = m.director_id
+GROUP BY 
+    d.director_id, d.director_name;
+</pre><p><br></p><p><strong>7. Retrieve all users who subscribed to the yearly plan:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username, 
+    s.subscription_type
+FROM 
+    Users u
+JOIN 
+    User_Subscriptions us ON u.user_id = us.user_id
+JOIN 
+    Subscriptions s ON us.subscription_id = s.subscription_id
+WHERE 
+    s.subscription_type = 'Yearly';
+</pre><p><br></p><p><strong>8. List movies with multiple genres (assuming a movie can belong to multiple genres):</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    COUNT(mg.genre_id) AS Number_of_Genres
+FROM 
+    Movies m
+JOIN 
+    Movie_Genres mg ON m.movie_id = mg.movie_id
+GROUP BY 
+    m.movie_id, m.title
+HAVING 
+    COUNT(mg.genre_id) &gt; 1;
+</pre><p><br></p><p><strong>9. Find users who have watched movies from all available genres:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username
+FROM 
+    Users u
+JOIN 
+    Viewing_History vh ON u.user_id = vh.user_id
+JOIN 
+    Movies m ON vh.movie_id = m.movie_id
+JOIN 
+    Genres g ON m.genre_id = g.genre_id
+GROUP BY 
+    u.user_id, u.username
+HAVING 
+    COUNT(DISTINCT g.genre_id) = (SELECT COUNT(*) FROM Genres);
+</pre><p><br></p><p><strong>10. Get the list of actors who have acted in more than one movie:</strong></p><pre class="prettyprint linenums">SELECT 
+    a.actor_name, 
+    COUNT(ma.movie_id) AS Number_of_Movies
+FROM 
+    Actors a
+JOIN 
+    Movie_Actors ma ON a.actor_id = ma.actor_id
+GROUP BY 
+    a.actor_id, a.actor_name
+HAVING 
+    COUNT(ma.movie_id) &gt; 1;
+</pre><p><br></p><p><strong>11. List all movies and the number of reviews they have received:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    COUNT(r.review_id) AS Number_of_Reviews
+FROM 
+    Movies m
+LEFT JOIN 
+    Reviews r ON m.movie_id = r.movie_id
+GROUP BY 
+    m.movie_id, m.title;
+</pre><p><br></p><p><strong>12. Retrieve the average rating of each director's movies:</strong></p><pre class="prettyprint linenums">SELECT 
+    d.director_name, 
+    AVG(r.rating) AS Average_Rating
+FROM 
+    Directors d
+JOIN 
+    Movies m ON d.director_id = m.director_id
+JOIN 
+    Ratings r ON m.movie_id = r.movie_id
+GROUP BY 
+    d.director_id, d.director_name;
+</pre><p><br></p><p><strong>13. Find the movie with the most 5-star ratings:</strong></p><pre class="prettyprint linenums">SELECT 
+    m.title AS Movie_Title, 
+    COUNT(r.rating_id) AS Number_of_5_Star_Ratings
+FROM 
+    Movies m
+JOIN 
+    Ratings r ON m.movie_id = r.movie_id
+WHERE 
+    r.rating = 5
+GROUP BY 
+    m.movie_id, m.title
+ORDER BY 
+    Number_of_5_Star_Ratings DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>14. List users who have provided both ratings and reviews for the same movie:</strong></p><pre class="prettyprint linenums">SELECT 
+    u.username, 
+    m.title AS Movie_Title
+FROM 
+    Users u
+JOIN 
+    Ratings r ON u.user_id = r.user_id
+JOIN 
+    Reviews rv ON r.user_id = rv.user_id AND r.movie_id = rv.movie_id
+JOIN 
+    Movies m ON r.movie_id = m.movie_id
+GROUP BY 
+    u.username, m.title;
+</pre><p><br></p><p><strong>15. Retrieve the top 3 most popular genres based on movie views:</strong></p><pre class="prettyprint linenums">SELECT 
+    g.genre_name, 
+    COUNT(vh.history_id) AS Number_of_Views
+FROM 
+    Viewing_History vh
+JOIN 
+    Movies m ON vh.movie_id = m.movie_id
+JOIN 
+    Genres g ON m.genre_id = g.genre_id
+GROUP BY 
+    g.genre_id, g.genre_name
+ORDER BY 
+    Number_of_Views DESC
+LIMIT 3;
+</pre><h4></h4>

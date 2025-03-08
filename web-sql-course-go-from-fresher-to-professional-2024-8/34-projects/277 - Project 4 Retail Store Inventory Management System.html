@@ -1,0 +1,259 @@
+<h4><strong>Project: Retail Store Inventory Management System</strong></h4><p><br></p><p>A Retail Store Inventory Management System is designed to handle various tasks related to managing products, suppliers, sales, and inventory levels in a retail environment. This system allows store managers to maintain accurate records of stock, streamline ordering processes, and optimize inventory levels.</p><p><br></p><h4><strong>Key Features:</strong></h4><ol><li><p><strong>Product Management</strong>: Manage product details, including adding, updating, and deleting product information.</p></li><li><p><strong>Supplier Management</strong>: Keep track of suppliers and their products, along with contact information.</p></li><li><p><strong>Inventory Management</strong>: Monitor stock levels, manage inventory, and handle stock replenishment.</p></li><li><p><strong>Sales Management</strong>: Track sales transactions, generate sales reports, and analyze sales trends.</p></li><li><p><strong>Order Management</strong>: Manage purchase orders and incoming inventory.</p></li><li><p><strong>Reporting</strong>: Generate reports for inventory levels, sales, low-stock alerts, and supplier performance.</p></li></ol><p><br></p><h4><strong>Database Schema</strong></h4><p>Let's define the tables and their relationships for the Retail Store Inventory Management System.</p><ol><li><p><strong>Products</strong>: Stores information about each product in the store.</p><ul><li><p><code>product_id</code> (INT, Primary Key)</p></li><li><p><code>product_name</code> (VARCHAR(100))</p></li><li><p><code>category</code> (VARCHAR(50))</p></li><li><p><code>price</code> (DECIMAL(10, 2))</p></li><li><p><code>stock_quantity</code> (INT)</p></li><li><p><code>supplier_id</code> (INT, Foreign Key)</p></li></ul></li><li><p><strong>Suppliers</strong>: Stores information about suppliers.</p><ul><li><p><code>supplier_id</code> (INT, Primary Key)</p></li><li><p><code>supplier_name</code> (VARCHAR(100))</p></li><li><p><code>contact_number</code> (VARCHAR(15))</p></li><li><p><code>email</code> (VARCHAR(100))</p></li><li><p><code>address</code> (VARCHAR(255))</p></li></ul></li><li><p><strong>Sales</strong>: Stores information about sales transactions.</p><ul><li><p><code>sale_id</code> (INT, Primary Key)</p></li><li><p><code>sale_date</code> (DATE)</p></li><li><p><code>total_amount</code> (DECIMAL(10, 2))</p></li></ul></li><li><p><strong>Sales_Details</strong>: Stores details of each product sold in a sale.</p><ul><li><p><code>sale_detail_id</code> (INT, Primary Key)</p></li><li><p><code>sale_id</code> (INT, Foreign Key)</p></li><li><p><code>product_id</code> (INT, Foreign Key)</p></li><li><p><code>quantity</code> (INT)</p></li><li><p><code>sale_price</code> (DECIMAL(10, 2))</p></li></ul></li><li><p><strong>Purchase_Orders</strong>: Stores information about purchase orders for restocking inventory.</p><ul><li><p><code>order_id</code> (INT, Primary Key)</p></li><li><p><code>order_date</code> (DATE)</p></li><li><p><code>supplier_id</code> (INT, Foreign Key)</p></li><li><p><code>total_amount</code> (DECIMAL(10, 2))</p></li></ul></li><li><p><strong>Order_Details</strong>: Stores details of each product in a purchase order.</p><ul><li><p><code>order_detail_id</code> (INT, Primary Key)</p></li><li><p><code>order_id</code> (INT, Foreign Key)</p></li><li><p><code>product_id</code> (INT, Foreign Key)</p></li><li><p><code>quantity</code> (INT)</p></li><li><p><code>purchase_price</code> (DECIMAL(10, 2))</p></li></ul></li></ol><p><br></p><h4><strong>SQL Queries</strong></h4><h4>1. <strong>Create Tables</strong></h4><pre class="prettyprint linenums">CREATE TABLE Suppliers (
+    supplier_id INT PRIMARY KEY,
+    supplier_name VARCHAR(100),
+    contact_number VARCHAR(15),
+    email VARCHAR(100),
+    address VARCHAR(255)
+);
+
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10, 2),
+    stock_quantity INT,
+    supplier_id INT,
+    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id)
+);
+
+CREATE TABLE Sales (
+    sale_id INT PRIMARY KEY,
+    sale_date DATE,
+    total_amount DECIMAL(10, 2)
+);
+
+CREATE TABLE Sales_Details (
+    sale_detail_id INT PRIMARY KEY,
+    sale_id INT,
+    product_id INT,
+    quantity INT,
+    sale_price DECIMAL(10, 2),
+    FOREIGN KEY (sale_id) REFERENCES Sales(sale_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+CREATE TABLE Purchase_Orders (
+    order_id INT PRIMARY KEY,
+    order_date DATE,
+    supplier_id INT,
+    total_amount DECIMAL(10, 2),
+    FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id)
+);
+
+CREATE TABLE Order_Details (
+    order_detail_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    purchase_price DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES Purchase_Orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+</pre><p><br></p><h4>2. <strong>Insert Sample Data</strong></h4><pre class="prettyprint linenums">-- Insert Suppliers
+INSERT INTO Suppliers (supplier_id, supplier_name, contact_number, email, address)
+VALUES
+(1, 'ABC Suppliers', '123-456-7890', 'abc@suppliers.com', '123 Main St'),
+(2, 'XYZ Suppliers', '987-654-3210', 'xyz@suppliers.com', '456 Elm St');
+
+-- Insert Products
+INSERT INTO Products (product_id, product_name, category, price, stock_quantity, supplier_id)
+VALUES
+(1, 'Product A', 'Electronics', 199.99, 50, 1),
+(2, 'Product B', 'Clothing', 29.99, 200, 2),
+(3, 'Product C', 'Groceries', 2.99, 1000, 1);
+
+-- Insert Sales
+INSERT INTO Sales (sale_id, sale_date, total_amount)
+VALUES
+(1, '2024-08-01', 229.97),
+(2, '2024-08-05', 59.98);
+
+-- Insert Sales Details
+INSERT INTO Sales_Details (sale_detail_id, sale_id, product_id, quantity, sale_price)
+VALUES
+(1, 1, 1, 1, 199.99),
+(2, 1, 2, 1, 29.99),
+(3, 2, 2, 2, 29.99);
+
+-- Insert Purchase Orders
+INSERT INTO Purchase_Orders (order_id, order_date, supplier_id, total_amount)
+VALUES
+(1, '2024-07-28', 1, 1500.00),
+(2, '2024-08-03', 2, 900.00);
+
+-- Insert Order Details
+INSERT INTO Order_Details (order_detail_id, order_id, product_id, quantity, purchase_price)
+VALUES
+(1, 1, 1, 10, 150.00),
+(2, 2, 2, 30, 30.00);
+</pre><p><br></p><h4>3. <strong>Queries for Various Operations</strong></h4><ul><li><p><strong>List all products in stock:</strong></p><pre class="prettyprint linenums">SELECT * FROM Products;
+</pre><p><br></p></li><li><p><strong>Find products with low stock (below 20 units):</strong></p><pre class="prettyprint linenums">SELECT product_name, stock_quantity 
+FROM Products 
+WHERE stock_quantity &lt; 20;
+</pre><p><br></p></li><li><p><strong>Get total sales for each product:</strong></p><pre class="prettyprint linenums">SELECT p.product_name, SUM(sd.quantity) AS total_sold
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+GROUP BY p.product_name;
+</pre><p><br></p></li><li><p><strong>Update stock after a sale:</strong></p><pre class="prettyprint linenums">UPDATE Products
+SET stock_quantity = stock_quantity - 2
+WHERE product_id = 2;
+</pre><p><br></p></li><li><p><strong>Generate a report of sales by month:</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(sale_date, '%Y-%m') AS sale_month, SUM(total_amount) AS total_sales
+FROM Sales
+GROUP BY sale_month;
+</pre><p><br></p></li><li><p><strong>Insert a new product:</strong></p><pre class="prettyprint linenums">INSERT INTO Products (product_id, product_name, category, price, stock_quantity, supplier_id)
+VALUES (4, 'Product D', 'Home Goods', 49.99, 150, 2);
+</pre><p><br></p></li><li><p><strong>Delete a supplier:</strong></p><pre class="prettyprint linenums">DELETE FROM Suppliers
+WHERE supplier_id = 3;</pre></li></ul><p><br></p><h4><strong>Additional Queries</strong></h4><ul><li><p><strong>Find the top 5 best-selling products:</strong></p><pre class="prettyprint linenums">SELECT p.product_name, SUM(sd.quantity) AS total_sold
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sold DESC
+LIMIT 5;
+</pre><p><br></p></li><li><p><strong>List all suppliers with the number of products they supply:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, COUNT(p.product_id) AS number_of_products
+FROM Suppliers s
+LEFT JOIN Products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>Get details of the most recent sales transaction:</strong></p><pre class="prettyprint linenums">SELECT * FROM Sales
+ORDER BY sale_date DESC
+LIMIT 1;</pre><p><br></p></li><li><p><strong>Calculate the total revenue generated by each supplier's products:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, SUM(sd.sale_price * sd.quantity) AS total_revenue
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+JOIN Suppliers s ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>Find the product with the highest stock quantity:</strong></p><pre class="prettyprint linenums">SELECT product_name, stock_quantity
+FROM Products
+ORDER BY stock_quantity DESC
+LIMIT 1;
+</pre><p><br></p></li><li><p><strong>Identify products that have never been sold:</strong></p><pre class="prettyprint linenums">SELECT p.product_id, p.product_name
+FROM Products p
+LEFT JOIN Sales_Details sd ON p.product_id = sd.product_id
+WHERE sd.product_id IS NULL;
+</pre><p><br></p></li><li><p><strong>Get the average price of products in each category:</strong></p><pre class="prettyprint linenums">SELECT category, AVG(price) AS average_price
+FROM Products
+GROUP BY category;</pre><p><br></p></li><li><p><strong>List all sales along with the customer who bought the most expensive product:</strong></p><pre class="prettyprint linenums">SELECT s.sale_id, s.sale_date, sd.product_id, p.product_name, sd.sale_price
+FROM Sales s
+JOIN Sales_Details sd ON s.sale_id = sd.sale_id
+JOIN Products p ON sd.product_id = p.product_id
+WHERE sd.sale_price = (SELECT MAX(sale_price) FROM Sales_Details);
+</pre><p><br></p></li><li><p><strong>Find the total quantity of each product ordered from suppliers:</strong></p><pre class="prettyprint linenums">SELECT p.product_name, SUM(od.quantity) AS total_ordered
+FROM Order_Details od
+JOIN Products p ON od.product_id = p.product_id
+GROUP BY p.product_name;
+</pre><p><br></p></li><li><p><strong>Get the list of products that need to be restocked (stock quantity less than a threshold, e.g., 10 units):</strong></p><pre class="prettyprint linenums">SELECT product_name, stock_quantity
+FROM Products
+WHERE stock_quantity &lt; 10;
+</pre><p><br></p></li><li><p><strong>Calculate the total number of products sold and total sales amount for a specific date range:</strong></p><pre class="prettyprint linenums">SELECT SUM(sd.quantity) AS total_products_sold, SUM(sd.sale_price * sd.quantity) AS total_sales_amount
+FROM Sales s
+JOIN Sales_Details sd ON s.sale_id = sd.sale_id
+WHERE s.sale_date BETWEEN '2024-08-01' AND '2024-08-31';
+</pre><p><br></p></li><li><p><strong>Generate a report of daily sales totals:</strong></p><pre class="prettyprint linenums">SELECT sale_date, SUM(total_amount) AS daily_sales
+FROM Sales
+GROUP BY sale_date
+ORDER BY sale_date;
+</pre><p><br></p></li><li><p><strong>Find the supplier who provides the most expensive products:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, MAX(p.price) AS max_product_price
+FROM Products p
+JOIN Suppliers s ON p.supplier_id = s.supplier_id
+GROUP BY s.supplier_name
+ORDER BY max_product_price DESC
+LIMIT 1;
+</pre><p><br></p></li><li><p><strong>List all products that are sold out (stock quantity is 0):</strong></p><pre class="prettyprint linenums">SELECT product_name
+FROM Products
+WHERE stock_quantity = 0;
+</pre><p><br></p></li><li><p><strong>Calculate the profit for each product sold (assuming sale_price - purchase_price):</strong></p><pre class="prettyprint linenums">SELECT p.product_name, 
+       (sd.sale_price - od.purchase_price) * sd.quantity AS profit
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+JOIN Order_Details od ON sd.product_id = od.product_id;
+</pre><p><br></p></li><li><p><strong>Identify the top 3 most profitable products:</strong></p><pre class="prettyprint linenums">SELECT p.product_name, 
+       SUM((sd.sale_price - od.purchase_price) * sd.quantity) AS total_profit
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+JOIN Order_Details od ON sd.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY total_profit DESC
+LIMIT 3;
+</pre><p><br></p></li><li><p><strong>Find the average stock quantity of products per supplier:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, AVG(p.stock_quantity) AS average_stock
+FROM Suppliers s
+JOIN Products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>List all orders with the total number of different products ordered:</strong></p><pre class="prettyprint linenums">SELECT po.order_id, COUNT(od.product_id) AS number_of_products_ordered
+FROM Purchase_Orders po
+JOIN Order_Details od ON po.order_id = od.order_id
+GROUP BY po.order_id;</pre><p><br></p></li><li><p><strong>Identify the month with the highest sales revenue:</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(sale_date, '%Y-%m') AS month, SUM(total_amount) AS monthly_sales
+FROM Sales
+GROUP BY month
+ORDER BY monthly_sales DESC
+LIMIT 1;
+</pre><p><br></p></li><li><p><strong>Find the most frequent customer (assuming you have a </strong><code><strong>Customers</strong></code><strong> table related to </strong><code><strong>Sales</strong></code><strong>):</strong></p><pre class="prettyprint linenums">SELECT c.customer_id, c.customer_name, COUNT(s.sale_id) AS purchase_count
+FROM Customers c
+JOIN Sales s ON c.customer_id = s.customer_id
+GROUP BY c.customer_id, c.customer_name
+ORDER BY purchase_count DESC
+LIMIT 1;
+</pre><p><br></p></li><li><p><strong>Calculate the average time between placing an order and receiving the inventory:</strong></p><p>(Assuming you have <code>order_date</code> and <code>received_date</code> columns in the <code>Purchase_Orders</code> table)</p><pre class="prettyprint linenums">SELECT AVG(DATEDIFF(received_date, order_date)) AS average_days_to_receive
+FROM Purchase_Orders
+WHERE received_date IS NOT NULL;
+</pre><p><br></p></li><li><p><strong>Get the top 3 categories by total sales amount:</strong></p><pre class="prettyprint linenums">SELECT p.category, SUM(sd.sale_price * sd.quantity) AS total_sales
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+GROUP BY p.category
+ORDER BY total_sales DESC
+LIMIT 3;
+</pre><p><br></p></li><li><p><strong>Find products with sales greater than their stock quantity (possible overstocking issue):</strong></p><pre class="prettyprint linenums">SELECT p.product_name, SUM(sd.quantity) AS total_sold, p.stock_quantity
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+GROUP BY p.product_name, p.stock_quantity
+HAVING total_sold &gt; p.stock_quantity;
+</pre><p><br></p></li><li><p><strong>List the total amount spent per customer (assuming the </strong><code><strong>Sales</strong></code><strong> table has a </strong><code><strong>customer_id</strong></code><strong>):</strong></p><pre class="prettyprint linenums">SELECT c.customer_name, SUM(s.total_amount) AS total_spent
+FROM Sales s
+JOIN Customers c ON s.customer_id = c.customer_id
+GROUP BY c.customer_name;
+</pre><p><br></p></li><li><p><strong>Find the average sales amount per transaction for a given month:</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(sale_date, '%Y-%m') AS month, AVG(total_amount) AS avg_transaction_amount
+FROM Sales
+WHERE sale_date BETWEEN '2024-08-01' AND '2024-08-31'
+GROUP BY month;
+</pre><p><br></p></li><li><p><strong>Get the top 5 products with the highest profit margins:</strong></p><p>(Assuming <code>profit_margin</code> is calculated as <code>sale_price - purchase_price</code>)</p><pre class="prettyprint linenums">SELECT p.product_name, (sd.sale_price - od.purchase_price) AS profit_margin
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+JOIN Order_Details od ON sd.product_id = od.product_id
+ORDER BY profit_margin DESC
+LIMIT 5;
+</pre><p><br></p></li><li><p><strong>Find the total number of orders and total order value for each supplier:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, COUNT(po.order_id) AS total_orders, SUM(po.total_amount) AS total_order_value
+FROM Purchase_Orders po
+JOIN Suppliers s ON po.supplier_id = s.supplier_id
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>Get the average number of items per sale:</strong></p><pre class="prettyprint linenums">SELECT AVG(items_per_sale) AS average_items_per_sale
+FROM (
+    SELECT s.sale_id, COUNT(sd.product_id) AS items_per_sale
+    FROM Sales s
+    JOIN Sales_Details sd ON s.sale_id = sd.sale_id
+    GROUP BY s.sale_id
+) AS sale_items;
+</pre><p><br></p></li><li><p><strong>Identify products that have been sold but are out of stock:</strong></p><pre class="prettyprint linenums">SELECT p.product_name, SUM(sd.quantity) AS total_sold
+FROM Products p
+JOIN Sales_Details sd ON p.product_id = sd.product_id
+GROUP BY p.product_name
+HAVING total_sold &gt; (SELECT stock_quantity FROM Products WHERE product_id = p.product_id);
+</pre><p><br></p></li><li><p><strong>Find the number of days each product has been out of stock (assuming </strong><code><strong>stock_out_date</strong></code><strong> column):</strong></p><pre class="prettyprint linenums">SELECT product_name, DATEDIFF(CURDATE(), stock_out_date) AS days_out_of_stock
+FROM Products
+WHERE stock_quantity = 0;</pre><p><br></p></li><li><p><strong>Get the total revenue generated by each supplier in the last 30 days:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, SUM(sd.sale_price * sd.quantity) AS total_revenue
+FROM Sales_Details sd
+JOIN Products p ON sd.product_id = p.product_id
+JOIN Suppliers s ON p.supplier_id = s.supplier_id
+JOIN Sales sa ON sd.sale_id = sa.sale_id
+WHERE sa.sale_date &gt;= CURDATE() - INTERVAL 30 DAY
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>Calculate the total number of products purchased from each supplier in the last quarter:</strong></p><pre class="prettyprint linenums">SELECT s.supplier_name, SUM(od.quantity) AS total_products_purchased
+FROM Order_Details od
+JOIN Purchase_Orders po ON od.order_id = po.order_id
+JOIN Suppliers s ON po.supplier_id = s.supplier_id
+WHERE po.order_date &gt;= CURDATE() - INTERVAL 3 MONTH
+GROUP BY s.supplier_name;
+</pre><p><br></p></li><li><p><strong>Find the top 5 customers who have spent the most in the last year:</strong></p><pre class="prettyprint linenums">SELECT c.customer_name, SUM(s.total_amount) AS total_spent
+FROM Sales s
+JOIN Customers c ON s.customer_id = c.customer_id
+WHERE s.sale_date &gt;= CURDATE() - INTERVAL 1 YEAR
+GROUP BY c.customer_name
+ORDER BY total_spent DESC
+LIMIT 5;
+</pre></li></ul><h4></h4>

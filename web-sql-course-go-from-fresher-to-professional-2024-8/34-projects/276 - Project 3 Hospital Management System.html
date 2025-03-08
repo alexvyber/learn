@@ -1,0 +1,218 @@
+<h4><strong>Project: Hospital Management System</strong></h4><p><br></p><h4><strong>Project Overview:</strong></h4><p>The Hospital Management System is designed to manage various aspects of hospital operations, such as patient information, doctor details, appointments, treatments, prescriptions, and billing. The system aims to streamline hospital administration and improve service delivery.</p><p><br></p><h4><strong>Database Schema Design:</strong></h4><ol><li><p><strong>Patients Table</strong>:</p><ul><li><p><code>PatientID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>FirstName</code> (VARCHAR(50), Not Null)</p></li><li><p><code>LastName</code> (VARCHAR(50), Not Null)</p></li><li><p><code>Gender</code> (CHAR(1), Check constraint for 'M' or 'F')</p></li><li><p><code>DOB</code> (DATE, Not Null)</p></li><li><p><code>ContactNumber</code> (VARCHAR(15), Not Null)</p></li><li><p><code>Address</code> (VARCHAR(100), Not Null)</p></li><li><p><code>Email</code> (VARCHAR(100), Unique)</p></li></ul></li><li><p><strong>Doctors Table</strong>:</p><ul><li><p><code>DoctorID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>FirstName</code> (VARCHAR(50), Not Null)</p></li><li><p><code>LastName</code> (VARCHAR(50), Not Null)</p></li><li><p><code>Specialization</code> (VARCHAR(100), Not Null)</p></li><li><p><code>ContactNumber</code> (VARCHAR(15), Not Null)</p></li><li><p><code>Email</code> (VARCHAR(100), Unique)</p></li></ul></li><li><p><strong>Departments Table</strong>:</p><ul><li><p><code>DepartmentID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>DepartmentName</code> (VARCHAR(100), Not Null, Unique)</p></li><li><p><code>HeadOfDepartment</code> (VARCHAR(100))</p></li></ul></li><li><p><strong>Appointments Table</strong>:</p><ul><li><p><code>AppointmentID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>PatientID</code> (INT, Foreign Key referencing <code>Patients.PatientID</code>)</p></li><li><p><code>DoctorID</code> (INT, Foreign Key referencing <code>Doctors.DoctorID</code>)</p></li><li><p><code>AppointmentDate</code> (DATETIME, Not Null)</p></li><li><p><code>Status</code> (VARCHAR(50), Not Null)</p></li></ul></li><li><p><strong>Treatments Table</strong>:</p><ul><li><p><code>TreatmentID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>PatientID</code> (INT, Foreign Key referencing <code>Patients.PatientID</code>)</p></li><li><p><code>DoctorID</code> (INT, Foreign Key referencing <code>Doctors.DoctorID</code>)</p></li><li><p><code>TreatmentDate</code> (DATETIME, Not Null)</p></li><li><p><code>Description</code> (VARCHAR(255))</p></li></ul></li><li><p><strong>Prescriptions Table</strong>:</p><ul><li><p><code>PrescriptionID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>TreatmentID</code> (INT, Foreign Key referencing <code>Treatments.TreatmentID</code>)</p></li><li><p><code>MedicineName</code> (VARCHAR(100), Not Null)</p></li><li><p><code>Dosage</code> (VARCHAR(50), Not Null)</p></li><li><p><code>Duration</code> (VARCHAR(50), Not Null)</p></li></ul></li><li><p><strong>Billing Table</strong>:</p><ul><li><p><code>BillID</code> (INT, Primary Key, Auto Increment)</p></li><li><p><code>PatientID</code> (INT, Foreign Key referencing <code>Patients.PatientID</code>)</p></li><li><p><code>TreatmentID</code> (INT, Foreign Key referencing <code>Treatments.TreatmentID</code>)</p></li><li><p><code>Amount</code> (DECIMAL(10, 2), Not Null)</p></li><li><p><code>PaymentStatus</code> (VARCHAR(50), Not Null)</p></li><li><p><code>BillingDate</code> (DATETIME, Not Null)</p></li></ul></li></ol><p><br></p><h4><strong>SQL Operations:</strong></h4><ol><li><p><strong>Creating the Tables</strong>:</p></li></ol><pre class="prettyprint linenums">CREATE TABLE Patients (
+    PatientID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Gender CHAR(1) CHECK (Gender IN ('M', 'F')),
+    DOB DATE NOT NULL,
+    ContactNumber VARCHAR(15) NOT NULL,
+    Address VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE Doctors (
+    DoctorID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Specialization VARCHAR(100) NOT NULL,
+    ContactNumber VARCHAR(15) NOT NULL,
+    Email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(100) NOT NULL UNIQUE,
+    HeadOfDepartment VARCHAR(100)
+);
+
+CREATE TABLE Appointments (
+    AppointmentID INT PRIMARY KEY AUTO_INCREMENT,
+    PatientID INT,
+    DoctorID INT,
+    AppointmentDate DATETIME NOT NULL,
+    Status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+CREATE TABLE Treatments (
+    TreatmentID INT PRIMARY KEY AUTO_INCREMENT,
+    PatientID INT,
+    DoctorID INT,
+    TreatmentDate DATETIME NOT NULL,
+    Description VARCHAR(255),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctors(DoctorID)
+);
+
+CREATE TABLE Prescriptions (
+    PrescriptionID INT PRIMARY KEY AUTO_INCREMENT,
+    TreatmentID INT,
+    MedicineName VARCHAR(100) NOT NULL,
+    Dosage VARCHAR(50) NOT NULL,
+    Duration VARCHAR(50) NOT NULL,
+    FOREIGN KEY (TreatmentID) REFERENCES Treatments(TreatmentID)
+);
+
+CREATE TABLE Billing (
+    BillID INT PRIMARY KEY AUTO_INCREMENT,
+    PatientID INT,
+    TreatmentID INT,
+    Amount DECIMAL(10, 2) NOT NULL,
+    PaymentStatus VARCHAR(50) NOT NULL,
+    BillingDate DATETIME NOT NULL,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (TreatmentID) REFERENCES Treatments(TreatmentID)
+);
+</pre><p><br></p><p><strong>2. Inserting Sample Data</strong>:</p><pre class="prettyprint linenums">INSERT INTO Patients (FirstName, LastName, Gender, DOB, ContactNumber, Address, Email) 
+VALUES ('John', 'Doe', 'M', '1985-06-15', '1234567890', '123 Elm St', 'john.doe@example.com');
+
+INSERT INTO Doctors (FirstName, LastName, Specialization, ContactNumber, Email) 
+VALUES ('Jane', 'Smith', 'Cardiology', '0987654321', 'jane.smith@example.com');
+
+INSERT INTO Departments (DepartmentName, HeadOfDepartment) 
+VALUES ('Cardiology', 'Dr. Jane Smith');
+
+INSERT INTO Appointments (PatientID, DoctorID, AppointmentDate, Status) 
+VALUES (1, 1, '2024-08-26 10:30:00', 'Scheduled');
+
+INSERT INTO Treatments (PatientID, DoctorID, TreatmentDate, Description) 
+VALUES (1, 1, '2024-08-27 14:00:00', 'Routine check-up and ECG');
+
+INSERT INTO Prescriptions (TreatmentID, MedicineName, Dosage, Duration) 
+VALUES (1, 'Atorvastatin', '10 mg', '30 days');
+
+INSERT INTO Billing (PatientID, TreatmentID, Amount, PaymentStatus, BillingDate) 
+VALUES (1, 1, 200.00, 'Paid', '2024-08-28 15:00:00');
+</pre><p><br></p><p><strong>3. Complex Queries:</strong></p><p><strong>1. Retrieve all appointments for a specific doctor:</strong></p><pre class="prettyprint linenums">SELECT a.AppointmentID, p.FirstName, p.LastName, a.AppointmentDate, a.Status
+FROM Appointments a
+JOIN Patients p ON a.PatientID = p.PatientID
+WHERE a.DoctorID = 1;
+</pre><p><br></p><p><strong>2. Calculate total revenue generated by a specific doctor:</strong></p><pre class="prettyprint linenums">SELECT d.FirstName, d.LastName, SUM(b.Amount) AS TotalRevenue
+FROM Billing b
+JOIN Treatments t ON b.TreatmentID = t.TreatmentID
+JOIN Doctors d ON t.DoctorID = d.DoctorID
+WHERE d.DoctorID = 1
+GROUP BY d.FirstName, d.LastName;</pre><p><br></p><p><strong>3. Find all patients who have not yet paid their bills:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, b.Amount, b.PaymentStatus
+FROM Patients p
+JOIN Billing b ON p.PatientID = b.PatientID
+WHERE b.PaymentStatus = 'Unpaid';
+</pre><p><br></p><p><strong>4. List all doctors and their specialties in each department:</strong></p><pre class="prettyprint linenums">SELECT d.DepartmentName, doc.FirstName, doc.LastName, doc.Specialization
+FROM Departments d
+JOIN Doctors doc ON d.HeadOfDepartment = CONCAT('Dr. ', doc.FirstName, ' ', doc.LastName);
+</pre><p><br></p><p><strong>5. Procedure to add a new patient:</strong></p><pre class="prettyprint linenums">CREATE PROCEDURE AddPatient(
+    IN firstName VARCHAR(50),
+    IN lastName VARCHAR(50),
+    IN gender CHAR(1),
+    IN dob DATE,
+    IN contactNumber VARCHAR(15),
+    IN address VARCHAR(100),
+    IN email VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Patients (FirstName, LastName, Gender, DOB, ContactNumber, Address, Email) 
+    VALUES (firstName, lastName, gender, dob, contactNumber, address, email);
+END;
+</pre><p><br></p><p><strong>6. Procedure to schedule a new appointment:</strong></p><pre class="prettyprint linenums">CREATE PROCEDURE ScheduleAppointment(
+    IN patientId INT,
+    IN doctorId INT,
+    IN appointmentDate DATETIME,
+    IN status VARCHAR(50)
+)
+BEGIN
+    INSERT INTO Appointments (PatientID, DoctorID, AppointmentDate, Status) 
+    VALUES (patientId, doctorId, appointmentDate, status);
+END;</pre><p><br></p><h4>Additional SQL Queries:</h4><p><strong>1. Retrieve all patients who have appointments in the next week:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, a.AppointmentDate
+FROM Patients p
+JOIN Appointments a ON p.PatientID = a.PatientID
+WHERE a.AppointmentDate BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY);
+</pre><p><br></p><p><strong>2. Find the total number of appointments each doctor has scheduled:</strong></p><pre class="prettyprint linenums">SELECT d.DoctorID, d.FirstName, d.LastName, COUNT(a.AppointmentID) AS TotalAppointments
+FROM Doctors d
+LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
+GROUP BY d.DoctorID, d.FirstName, d.LastName;
+</pre><p><br></p><p><strong>3. Get the list of all treatments and their corresponding patients for a specific date:</strong></p><pre class="prettyprint linenums">SELECT t.TreatmentID, p.FirstName, p.LastName, t.TreatmentDate, t.Description
+FROM Treatments t
+JOIN Patients p ON t.PatientID = p.PatientID
+WHERE DATE(t.TreatmentDate) = '2024-08-27';
+</pre><p><br></p><p><strong>4. Find the average amount spent by each patient on treatments:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, AVG(b.Amount) AS AverageAmountSpent
+FROM Patients p
+JOIN Billing b ON p.PatientID = b.PatientID
+GROUP BY p.PatientID, p.FirstName, p.LastName;
+</pre><p><br></p><p><strong>5. Retrieve the top 3 doctors with the highest number of appointments:</strong></p><pre class="prettyprint linenums">SELECT d.DoctorID, d.FirstName, d.LastName, COUNT(a.AppointmentID) AS AppointmentCount
+FROM Doctors d
+JOIN Appointments a ON d.DoctorID = a.DoctorID
+GROUP BY d.DoctorID, d.FirstName, d.LastName
+ORDER BY AppointmentCount DESC
+LIMIT 3;
+</pre><p><br></p><p><strong>6. List all prescriptions given for a particular treatment:</strong></p><pre class="prettyprint linenums">SELECT p.PrescriptionID, p.MedicineName, p.Dosage, p.Duration
+FROM Prescriptions p
+WHERE p.TreatmentID = 1;
+</pre><p><br></p><p><strong>7. Find all patients treated by a specific doctor:</strong></p><pre class="prettyprint linenums">SELECT DISTINCT p.PatientID, p.FirstName, p.LastName
+FROM Patients p
+JOIN Treatments t ON p.PatientID = t.PatientID
+WHERE t.DoctorID = 1;
+</pre><p><br></p><p><strong>8. Calculate the total revenue generated from a specific department:</strong></p><pre class="prettyprint linenums">SELECT dep.DepartmentName, SUM(b.Amount) AS TotalRevenue
+FROM Billing b
+JOIN Treatments t ON b.TreatmentID = t.TreatmentID
+JOIN Doctors d ON t.DoctorID = d.DoctorID
+JOIN Departments dep ON d.Specialization = dep.DepartmentName
+WHERE dep.DepartmentID = 1
+GROUP BY dep.DepartmentName;</pre><p><br></p><p><strong>9. Generate a report showing patient details along with their last appointment date:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, MAX(a.AppointmentDate) AS LastAppointmentDate
+FROM Patients p
+JOIN Appointments a ON p.PatientID = a.PatientID
+GROUP BY p.PatientID, p.FirstName, p.LastName;
+</pre><p><br></p><p><strong>10. Get the count of male and female patients in the hospital:</strong></p><pre class="prettyprint linenums">SELECT Gender, COUNT(*) AS Count
+FROM Patients
+GROUP BY Gender;
+</pre><p><br></p><p><strong>11. List all unpaid bills along with patient details and billing amount:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, b.BillID, b.Amount, b.BillingDate
+FROM Patients p
+JOIN Billing b ON p.PatientID = b.PatientID
+WHERE b.PaymentStatus = 'Unpaid';
+</pre><p><br></p><p><strong>12. Find the number of treatments provided by each doctor for a specific period:</strong></p><pre class="prettyprint linenums">SELECT d.DoctorID, d.FirstName, d.LastName, COUNT(t.TreatmentID) AS TotalTreatments
+FROM Doctors d
+JOIN Treatments t ON d.DoctorID = t.DoctorID
+WHERE t.TreatmentDate BETWEEN '2024-08-01' AND '2024-08-31'
+GROUP BY d.DoctorID, d.FirstName, d.LastName;
+</pre><p><br></p><p><strong>13. Identify patients who have had multiple treatments and list the number of treatments they have received:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, COUNT(t.TreatmentID) AS NumberOfTreatments
+FROM Patients p
+JOIN Treatments t ON p.PatientID = t.PatientID
+GROUP BY p.PatientID, p.FirstName, p.LastName
+HAVING COUNT(t.TreatmentID) &gt; 1;
+</pre><p><br></p><p><strong>14. Retrieve the details of all doctors who have not yet been assigned any appointments:</strong></p><pre class="prettyprint linenums">SELECT d.DoctorID, d.FirstName, d.LastName, d.Specialization
+FROM Doctors d
+LEFT JOIN Appointments a ON d.DoctorID = a.DoctorID
+WHERE a.AppointmentID IS NULL;
+</pre><p><br></p><p><strong>15. Find out the total billing amount for each patient who has had at least one paid bill:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, SUM(b.Amount) AS TotalPaidAmount
+FROM Patients p
+JOIN Billing b ON p.PatientID = b.PatientID
+WHERE b.PaymentStatus = 'Paid'
+GROUP BY p.PatientID, p.FirstName, p.LastName;
+</pre><p><br></p><p><strong>16. Determine the most frequently prescribed medication:</strong></p><pre class="prettyprint linenums">SELECT MedicineName, COUNT(*) AS PrescriptionCount
+FROM Prescriptions
+GROUP BY MedicineName
+ORDER BY PrescriptionCount DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>17. Retrieve all appointments that were canceled along with patient and doctor details:</strong></p><pre class="prettyprint linenums">SELECT a.AppointmentID, p.FirstName AS PatientFirstName, p.LastName AS PatientLastName, 
+       d.FirstName AS DoctorFirstName, d.LastName AS DoctorLastName, a.AppointmentDate
+FROM Appointments a
+JOIN Patients p ON a.PatientID = p.PatientID
+JOIN Doctors d ON a.DoctorID = d.DoctorID
+WHERE a.Status = 'Canceled';
+</pre><p><br></p><p><strong>18. List all patients who have visited more than one department:</strong></p><pre class="prettyprint linenums">SELECT p.PatientID, p.FirstName, p.LastName, COUNT(DISTINCT d.DepartmentID) AS DepartmentsVisited
+FROM Patients p
+JOIN Treatments t ON p.PatientID = t.PatientID
+JOIN Doctors doc ON t.DoctorID = doc.DoctorID
+JOIN Departments d ON doc.Specialization = d.DepartmentName
+GROUP BY p.PatientID, p.FirstName, p.LastName
+HAVING COUNT(DISTINCT d.DepartmentID) &gt; 1;
+</pre><p><br></p><p><strong>19. Find out which doctors have treated the highest number of different patients:</strong></p><pre class="prettyprint linenums">SELECT d.DoctorID, d.FirstName, d.LastName, COUNT(DISTINCT t.PatientID) AS UniquePatientsTreated
+FROM Doctors d
+JOIN Treatments t ON d.DoctorID = t.DoctorID
+GROUP BY d.DoctorID, d.FirstName, d.LastName
+ORDER BY UniquePatientsTreated DESC;</pre><p><br></p><p><strong>20. Generate a detailed billing report for all treatments in a given month:</strong></p><pre class="prettyprint linenums">SELECT b.BillID, p.FirstName AS PatientFirstName, p.LastName AS PatientLastName,
+       d.FirstName AS DoctorFirstName, d.LastName AS DoctorLastName, 
+       t.Description, b.Amount, b.BillingDate
+FROM Billing b
+JOIN Treatments t ON b.TreatmentID = t.TreatmentID
+JOIN Patients p ON b.PatientID = p.PatientID
+JOIN Doctors d ON t.DoctorID = d.DoctorID
+WHERE MONTH(b.BillingDate) = 8 AND YEAR(b.BillingDate) = 2024;</pre>

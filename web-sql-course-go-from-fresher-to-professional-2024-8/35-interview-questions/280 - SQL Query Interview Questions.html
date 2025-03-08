@@ -1,0 +1,448 @@
+<h4><strong>Basic SQL Queries</strong></h4><ol><li><p><strong>Retrieve all records from the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees;
+</pre></li><li><p><strong>Select the first name and last name of employees from the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name FROM employees;
+</pre></li><li><p><strong>Find all unique job titles from the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT DISTINCT job_title FROM employees;
+</pre></li><li><p><strong>Count the number of employees in the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT COUNT(*) FROM employees;
+</pre></li><li><p><strong>Find the employee with the highest salary.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees ORDER BY salary DESC LIMIT 1;
+</pre></li><li><p><strong>Retrieve employees whose first name starts with 'A'.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees WHERE first_name LIKE 'A%';
+</pre></li><li><p><strong>Find all employees who earn more than $50,000.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees WHERE salary &gt; 50000;
+</pre></li><li><p><strong>Retrieve the top 5 highest-paid employees.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees ORDER BY salary DESC LIMIT 5;
+</pre></li><li><p><strong>List all employees who were hired in 2020.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees WHERE YEAR(hire_date) = 2020;
+</pre></li><li><p><strong>Find the total salary paid to all employees.</strong></p><pre class="prettyprint linenums">SELECT SUM(salary) FROM employees;</pre></li></ol><p><br></p><h4><strong>Intermediate SQL Queries</strong></h4><ol start="11"><li><p><strong>Find the average salary of employees in the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT AVG(salary) FROM employees;
+</pre></li><li><p><strong>Count the number of employees in each department.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(*) FROM employees GROUP BY department_id;
+</pre></li><li><p><strong>Find the department with the highest number of employees.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(*) AS emp_count
+FROM employees
+GROUP BY department_id
+ORDER BY emp_count DESC
+LIMIT 1;
+</pre></li><li><p><strong>Retrieve the names of employees along with their department names.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name, d.department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id;
+</pre></li><li><p><strong>Find all employees who do not have a manager.</strong></p><pre class="prettyprint linenums">SELECT * FROM employees WHERE manager_id IS NULL;
+</pre></li><li><p><strong>List the names of employees who work in the 'Sales' department.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'Sales';
+</pre></li><li><p><strong>Retrieve the highest salary in each department.</strong></p><pre class="prettyprint linenums">SELECT department_id, MAX(salary) FROM employees GROUP BY department_id;
+</pre></li><li><p><strong>Find the second highest salary in the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT MAX(salary) AS SecondHighestSalary
+FROM employees
+WHERE salary &lt; (SELECT MAX(salary) FROM employees);
+</pre></li><li><p><strong>Retrieve all employees who were hired after their managers.</strong></p><pre class="prettyprint linenums">SELECT e1.first_name, e1.last_name
+FROM employees e1
+JOIN employees e2 ON e1.manager_id = e2.employee_id
+WHERE e1.hire_date &gt; e2.hire_date;
+</pre></li><li><p><strong>Find all departments that have more than 5 employees.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(*) AS emp_count
+FROM employees
+GROUP BY department_id
+HAVING emp_count &gt; 5;</pre></li></ol><p><br></p><h4><strong>Advanced SQL Queries</strong></h4><ol start="21"><li><p><strong>Retrieve employees with the same job title as their managers.</strong></p><pre class="prettyprint linenums">SELECT e1.first_name, e1.last_name
+FROM employees e1
+JOIN employees e2 ON e1.manager_id = e2.employee_id
+WHERE e1.job_title = e2.job_title;
+</pre></li><li><p><strong>List employees who earn more than the average salary in their department.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, salary
+FROM employees e
+WHERE salary &gt; (
+  SELECT AVG(salary)
+  FROM employees
+  WHERE department_id = e.department_id
+);
+</pre></li><li><p><strong>Find the difference between the highest and lowest salary in the </strong><code><strong>employees</strong></code><strong> table.</strong></p><pre class="prettyprint linenums">SELECT MAX(salary) - MIN(salary) AS salary_difference FROM employees;
+</pre></li><li><p><strong>Retrieve the names of employees who have the same first name as their manager.</strong></p><pre class="prettyprint linenums">SELECT e1.first_name, e1.last_name
+FROM employees e1
+JOIN employees e2 ON e1.manager_id = e2.employee_id
+WHERE e1.first_name = e2.first_name;
+</pre></li><li><p><strong>Find all employees who were hired on the same date.</strong></p><pre class="prettyprint linenums">SELECT hire_date, GROUP_CONCAT(first_name, ' ', last_name) AS employees
+FROM employees
+GROUP BY hire_date
+HAVING COUNT(*) &gt; 1;
+</pre></li><li><p><strong>Retrieve the first and last name of employees whose salary is within 10% of the maximum salary in the department.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, salary
+FROM employees e
+WHERE salary &gt;= (
+  SELECT MAX(salary) * 0.9
+  FROM employees
+  WHERE department_id = e.department_id
+);
+</pre></li><li><p><strong>List the departments that do not have any employees.</strong></p><pre class="prettyprint linenums">SELECT department_name
+FROM departments d
+LEFT JOIN employees e ON d.department_id = e.department_id
+WHERE e.department_id IS NULL;
+</pre></li><li><p><strong>Find the top three highest salaries in each department.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary
+FROM (
+  SELECT department_id, first_name, last_name, salary,
+         DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rank
+  FROM employees
+) AS ranked_salaries
+WHERE rank &lt;= 3;
+</pre></li><li><p><strong>Retrieve the employee who has been with the company the longest.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+ORDER BY hire_date ASC
+LIMIT 1;
+</pre></li><li><p><strong>Find all employees who earn more than their manager.</strong></p><pre class="prettyprint linenums">SELECT e1.first_name, e1.last_name, e1.salary
+FROM employees e1
+JOIN employees e2 ON e1.manager_id = e2.employee_id
+WHERE e1.salary &gt; e2.salary;</pre></li></ol><p><br></p><h4><strong>Complex SQL Queries</strong></h4><ol start="31"><li><p><strong>Retrieve the department with the highest total salary.</strong></p><pre class="prettyprint linenums">SELECT department_id, SUM(salary) AS total_salary
+FROM employees
+GROUP BY department_id
+ORDER BY total_salary DESC
+LIMIT 1;
+</pre></li><li><p><strong>Find the employee(s) with the longest name(s).</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name
+FROM employees
+ORDER BY LENGTH(first_name) + LENGTH(last_name) DESC
+LIMIT 1;
+</pre></li><li><p><strong>List all managers who manage more than 5 employees.</strong></p><pre class="prettyprint linenums">SELECT manager_id, COUNT(*) AS num_employees
+FROM employees
+GROUP BY manager_id
+HAVING num_employees &gt; 5;
+</pre></li><li><p><strong>Retrieve employees who have never changed their job title.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name
+FROM employees e
+LEFT JOIN job_history jh ON e.employee_id = jh.employee_id
+WHERE jh.employee_id IS NULL;
+</pre></li><li><p><strong>Find the department with the highest average salary.</strong></p><pre class="prettyprint linenums">SELECT department_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id
+ORDER BY avg_salary DESC
+LIMIT 1;
+</pre></li><li><p><strong>Retrieve employees who have worked in more than one department.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT department_id) AS dept_count
+FROM job_history
+GROUP BY employee_id
+HAVING dept_count &gt; 1;
+</pre></li><li><p><strong>Find employees who were hired in the last 30 days.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+WHERE hire_date &gt;= CURDATE() - INTERVAL 30 DAY;
+</pre></li><li><p><strong>List all employees who have the same job title as at least two other employees.</strong></p><pre class="prettyprint linenums">SELECT job_title, COUNT(*) AS count
+FROM employees
+GROUP BY job_title
+HAVING count &gt; 2;
+</pre></li><li><p><strong>Retrieve the names of employees whose salaries are below the average salary in their department but above the company average salary.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, salary
+FROM employees e
+WHERE salary &gt; (SELECT AVG(salary) FROM employees)
+  AND salary &lt; (SELECT AVG(salary) FROM employees e2 WHERE e.department_id = e2.department_id);
+</pre></li><li><p><strong>Find the highest-paid employee in each department along with their department name.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name, e.salary, d.department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE salary = (SELECT MAX(salary) FROM employees WHERE department_id = e.department_id);
+</pre></li><li><p><strong>List employees who have the same first name and last name.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, COUNT(*)
+FROM employees
+GROUP BY first_name, last_name
+HAVING COUNT(*) &gt; 1;
+</pre></li><li><p><strong>Retrieve employees who were hired more than 5 years ago and have never received a raise.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name, e.hire_date
+FROM employees e
+LEFT JOIN job_history jh ON e.employee_id = jh.employee_id
+WHERE jh.employee_id IS NULL AND e.hire_date &lt;= CURDATE() - INTERVAL 5 YEAR;
+</pre></li><li><p><strong>Find the average salary increase for employees who have changed jobs within the company.</strong></p><pre class="prettyprint linenums">SELECT AVG(new_salary - old_salary) AS avg_salary_increase
+FROM (
+  SELECT employee_id, MIN(salary) AS old_salary, MAX(salary) AS new_salary
+  FROM job_history
+  GROUP BY employee_id
+) AS salary_changes;
+</pre></li><li><p><strong>List all departments along with the number of employees and the total salary budget.</strong></p><pre class="prettyprint linenums">SELECT d.department_name, COUNT(e.employee_id) AS num_employees, SUM(e.salary) AS total_salary
+FROM departments d
+LEFT JOIN employees e ON d.department_id = e.department_id
+GROUP BY d.department_name;
+</pre></li><li><p><strong>Retrieve the names of employees who have a higher salary than the average salary of their department but do not have any subordinates.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name, e.salary
+FROM employees e
+WHERE salary &gt; (SELECT AVG(salary) FROM employees WHERE department_id = e.department_id)
+  AND employee_id NOT IN (SELECT DISTINCT manager_id FROM employees WHERE manager_id IS NOT NULL);
+</pre></li><li><p><strong>Find the departments where the difference between the highest and lowest salary is greater than $20,000.</strong></p><pre class="prettyprint linenums">SELECT department_id, MAX(salary) - MIN(salary) AS salary_difference
+FROM employees
+GROUP BY department_id
+HAVING salary_difference &gt; 20000;
+</pre></li><li><p><strong>List employees whose salary is more than twice the average salary of their department.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, salary
+FROM employees e
+WHERE salary &gt; 2 * (SELECT AVG(salary) FROM employees WHERE department_id = e.department_id);
+</pre></li><li><p><strong>Retrieve the names and hire dates of employees who have been with the company longer than all of their colleagues in the same department.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees e
+WHERE hire_date = (SELECT MIN(hire_date) FROM employees WHERE department_id = e.department_id);
+</pre></li><li><p><strong>Find the number of employees who earn more than the average salary in each department.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(*) AS num_employees
+FROM employees e
+WHERE salary &gt; (SELECT AVG(salary) FROM employees WHERE department_id = e.department_id)
+GROUP BY department_id;
+</pre></li><li><p><strong>List all employees who were hired on the first day of the month.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+WHERE DAY(hire_date) = 1;
+</pre></li><li><p><strong>Retrieve employees who have never managed anyone.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT manager_id FROM employees WHERE manager_id IS NOT NULL);
+</pre></li><li><p><strong>Find the department with the highest number of employees who have been promoted.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(DISTINCT employee_id) AS num_promotions
+FROM job_history
+GROUP BY department_id
+ORDER BY num_promotions DESC
+LIMIT 1;
+</pre></li><li><p><strong>List employees who have worked in the same department for more than 5 years.</strong></p><pre class="prettyprint linenums">SELECT employee_id, department_id, MIN(start_date) AS start_date
+FROM job_history
+GROUP BY employee_id, department_id
+HAVING DATEDIFF(CURDATE(), MIN(start_date)) &gt; 5 * 365;
+</pre></li><li><p><strong>Retrieve the names of employees who have the same last name as any other employee.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name
+FROM employees
+WHERE last_name IN (
+  SELECT last_name
+  FROM employees
+  GROUP BY last_name
+  HAVING COUNT(*) &gt; 1
+);
+</pre></li><li><p><strong>Find employees who have received a raise of more than 10% at any point in their career.</strong></p><pre class="prettyprint linenums">SELECT employee_id, old_salary, new_salary
+FROM (
+  SELECT employee_id, salary AS old_salary,
+         LEAD(salary) OVER (PARTITION BY employee_id ORDER BY start_date) AS new_salary
+  FROM job_history
+) AS salary_changes
+WHERE new_salary &gt; old_salary * 1.1;
+</pre></li><li><p><strong>List all employees who have a direct report (an employee who reports to them) earning more than themselves.</strong></p><pre class="prettyprint linenums">SELECT e1.first_name, e1.last_name, e1.salary
+FROM employees e1
+JOIN employees e2 ON e1.employee_id = e2.manager_id
+WHERE e2.salary &gt; e1.salary;
+</pre></li><li><p><strong>Retrieve employees who have changed their job title more than three times.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT job_title) AS num_changes
+FROM job_history
+GROUP BY employee_id
+HAVING num_changes &gt; 3;
+</pre></li><li><p><strong>Find all employees who were hired on a weekend.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+WHERE DAYOFWEEK(hire_date) IN (1, 7);
+</pre></li><li><p><strong>List employees who have had the same job title for more than 5 years.</strong></p><pre class="prettyprint linenums">SELECT employee_id, job_title, MIN(start_date) AS start_date
+FROM job_history
+GROUP BY employee_id, job_title
+HAVING DATEDIFF(CURDATE(), MIN(start_date)) &gt; 5 * 365;</pre></li><li><p><strong>Find all employees who have worked on more than 5 projects.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(*) AS project_count
+FROM employee_projects
+GROUP BY employee_id
+HAVING project_count &gt; 5;</pre></li></ol><p><br></p><h4><strong>SQL Queries with Subqueries and CTEs</strong></h4><ol start="61"><li><p><strong>Retrieve the department with the lowest average salary.</strong></p><pre class="prettyprint linenums">SELECT department_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id
+ORDER BY avg_salary ASC
+LIMIT 1;
+</pre></li><li><p><strong>List all employees whose salary is the highest within their department.</strong></p><pre class="prettyprint linenums">WITH MaxSalaries AS (
+  SELECT department_id, MAX(salary) AS max_salary
+  FROM employees
+  GROUP BY department_id
+)
+SELECT e.first_name, e.last_name, e.salary
+FROM employees e
+JOIN MaxSalaries ms ON e.department_id = ms.department_id AND e.salary = ms.max_salary;
+</pre></li><li><p><strong>Find employees who were hired before their department head.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name, e.hire_date
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+JOIN employees dh ON d.manager_id = dh.employee_id
+WHERE e.hire_date &lt; dh.hire_date;</pre></li><li><p><strong>List departments where the total number of employees is more than twice the average number of employees across all departments.</strong></p><pre class="prettyprint linenums">WITH AvgEmployees AS (
+  SELECT AVG(emp_count) AS avg_emp_count
+  FROM (
+    SELECT department_id, COUNT(*) AS emp_count
+    FROM employees
+    GROUP BY department_id
+  ) AS DeptCounts
+)
+SELECT department_id, COUNT(*) AS emp_count
+FROM employees
+GROUP BY department_id
+HAVING COUNT(*) &gt; 2 * (SELECT avg_emp_count FROM AvgEmployees);
+</pre></li><li><p><strong>Retrieve the names of employees who have worked under more than three different managers.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT manager_id) AS num_managers
+FROM job_history
+GROUP BY employee_id
+HAVING num_managers &gt; 3;
+</pre></li><li><p><strong>Find employees who have worked for the company for more than 10 years.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+WHERE DATEDIFF(CURDATE(), hire_date) &gt; 10 * 365;
+</pre></li><li><p><strong>List the departments that have the same number of employees as another department.</strong></p><pre class="prettyprint linenums">SELECT d1.department_id, d2.department_id, COUNT(e1.employee_id) AS emp_count
+FROM employees e1
+JOIN employees e2 ON e1.department_id != e2.department_id
+JOIN departments d1 ON e1.department_id = d1.department_id
+JOIN departments d2 ON e2.department_id = d2.department_id
+WHERE e1.department_id != e2.department_id
+GROUP BY d1.department_id, d2.department_id
+HAVING emp_count = COUNT(e2.employee_id);
+</pre></li><li><p><strong>Retrieve employees who have been promoted more than twice.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(*) AS num_promotions
+FROM job_history
+WHERE job_title != (SELECT job_title FROM employees WHERE employee_id = job_history.employee_id)
+GROUP BY employee_id
+HAVING num_promotions &gt; 2;
+</pre></li><li><p><strong>Find the names of employees who have never worked in the same department as their manager.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name
+FROM employees e
+JOIN job_history jh ON e.employee_id = jh.employee_id
+WHERE jh.department_id != e.department_id
+  AND e.manager_id IS NOT NULL
+  AND e.manager_id NOT IN (
+    SELECT jh.manager_id
+    FROM job_history jh
+    WHERE jh.employee_id = e.manager_id
+  );
+</pre></li><li><p><strong>List all employees who have received a raise in each year they have worked for the company.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT YEAR(start_date)) AS years_worked
+FROM job_history
+GROUP BY employee_id
+HAVING COUNT(DISTINCT salary) = years_worked;
+</pre></li><li><p><strong>Retrieve the names of employees who have never taken a day off (assume no job history record means no leave taken).</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM job_history);
+</pre></li><li><p><strong>Find departments where the highest salary is more than 3 times the lowest salary.</strong></p><pre class="prettyprint linenums">SELECT department_id, MAX(salary) AS max_salary, MIN(salary) AS min_salary
+FROM employees
+GROUP BY department_id
+HAVING max_salary &gt; 3 * min_salary;
+</pre></li><li><p><strong>List employees who have worked in more than three different departments.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT department_id) AS num_departments
+FROM job_history
+GROUP BY employee_id
+HAVING num_departments &gt; 3;
+</pre></li><li><p><strong>Find the department with the most employees who have never been promoted.</strong></p><pre class="prettyprint linenums">WITH NoPromotion AS (
+  SELECT employee_id
+  FROM job_history
+  GROUP BY employee_id
+  HAVING COUNT(DISTINCT job_title) = 1
+)
+SELECT department_id, COUNT(*) AS num_no_promotions
+FROM employees e
+WHERE e.employee_id IN (SELECT employee_id FROM NoPromotion)
+GROUP BY department_id
+ORDER BY num_no_promotions DESC
+LIMIT 1;
+</pre></li><li><p><strong>Retrieve employees who have changed departments but not their job title.</strong></p><pre class="prettyprint linenums">SELECT employee_id, COUNT(DISTINCT department_id) AS num_departments
+FROM job_history
+GROUP BY employee_id, job_title
+HAVING num_departments &gt; 1;
+</pre></li><li><p><strong>List departments where more than 50% of the employees have been with the company for more than 5 years.</strong></p><pre class="prettyprint linenums">WITH LongTermEmployees AS (
+  SELECT department_id, COUNT(*) AS num_long_term
+  FROM employees
+  WHERE DATEDIFF(CURDATE(), hire_date) &gt; 5 * 365
+  GROUP BY department_id
+)
+SELECT lte.department_id
+FROM LongTermEmployees lte
+JOIN (SELECT department_id, COUNT(*) AS total_employees FROM employees GROUP BY department_id) AS de
+  ON lte.department_id = de.department_id
+WHERE lte.num_long_term &gt; de.total_employees * 0.5;
+</pre></li><li><p><strong>Find employees who have received the same salary for more than 3 consecutive years.</strong></p><pre class="prettyprint linenums">SELECT employee_id, salary, COUNT(*) AS years_with_same_salary
+FROM job_history
+GROUP BY employee_id, salary
+HAVING years_with_same_salary &gt; 3;
+</pre></li><li><p><strong>Retrieve the names of employees who have never worked in the largest department by headcount.</strong></p><pre class="prettyprint linenums">WITH LargestDepartment AS (
+  SELECT department_id
+  FROM employees
+  GROUP BY department_id
+  ORDER BY COUNT(*) DESC
+  LIMIT 1
+)
+SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (
+  SELECT employee_id FROM job_history WHERE department_id = (SELECT department_id FROM LargestDepartment)
+);
+</pre></li><li><p><strong>List employees who have worked in both the smallest and largest departments by headcount.</strong></p><pre class="prettyprint linenums">WITH DeptCounts AS (
+  SELECT department_id, COUNT(*) AS num_employees
+  FROM employees
+  GROUP BY department_id
+),
+SmallestDepartment AS (
+  SELECT department_id FROM DeptCounts ORDER BY num_employees ASC LIMIT 1
+),
+LargestDepartment AS (
+  SELECT department_id FROM DeptCounts ORDER BY num_employees DESC LIMIT 1
+)
+SELECT DISTINCT e.employee_id, e.first_name, e.last_name
+FROM employees e
+JOIN job_history jh ON e.employee_id = jh.employee_id
+WHERE jh.department_id IN ((SELECT department_id FROM SmallestDepartment), (SELECT department_id FROM LargestDepartment));
+</pre></li><li><p><strong>Find the employees who have received the maximum number of promotions.</strong></p><pre class="prettyprint linenums">WITH Promotions AS (
+  SELECT employee_id, COUNT(*) AS num_promotions
+  FROM job_history
+  WHERE job_title != (SELECT job_title FROM employees WHERE employee_id = job_history.employee_id)
+  GROUP BY employee_id
+)
+SELECT e.first_name, e.last_name, p.num_promotions
+FROM employees e
+JOIN Promotions p ON e.employee_id = p.employee_id
+WHERE p.num_promotions = (SELECT MAX(num_promotions) FROM Promotions);
+</pre></li></ol><p><br></p><h4><strong>SQL Queries with Aggregations and Window Functions</strong></h4><ol start="81"><li><p><strong>Retrieve the cumulative salary of all employees over time based on their hire date.</strong></p><pre class="prettyprint linenums">SELECT hire_date, SUM(salary) OVER (ORDER BY hire_date) AS cumulative_salary
+FROM employees
+ORDER BY hire_date;
+</pre></li><li><p><strong>Find the moving average of salaries for each employee based on their hire date.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date, salary,
+       AVG(salary) OVER (ORDER BY hire_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_salary
+FROM employees
+ORDER BY hire_date;
+</pre></li><li><p><strong>List the top 3 highest-paid employees in each department using a window function.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary
+FROM (
+  SELECT department_id, first_name, last_name, salary,
+         DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rank
+  FROM employees
+) AS ranked_salaries
+WHERE rank &lt;= 3;
+</pre></li><li><p><strong>Calculate the year-over-year salary growth for each employee.</strong></p><pre class="prettyprint linenums">SELECT employee_id, first_name, last_name, salary,
+       salary - LAG(salary, 1) OVER (PARTITION BY employee_id ORDER BY hire_date) AS salary_growth
+FROM employees
+ORDER BY employee_id, hire_date;
+</pre></li><li><p><strong>Find the difference between the highest and lowest salary in each department using a window function.</strong></p><pre class="prettyprint linenums">SELECT department_id, salary,
+       MAX(salary) OVER (PARTITION BY department_id) - MIN(salary) OVER (PARTITION BY department_id) AS salary_range
+FROM employees;
+</pre></li><li><p><strong>List employees with their rank in salary within their department.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary,
+       RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS salary_rank
+FROM employees;
+</pre></li><li><p><strong>Retrieve the first and last hire dates of employees within each department.</strong></p><pre class="prettyprint linenums">SELECT department_id,
+       MIN(hire_date) OVER (PARTITION BY department_id) AS first_hire_date,
+       MAX(hire_date) OVER (PARTITION BY department_id) AS last_hire_date
+FROM employees;
+</pre></li><li><p><strong>Calculate the difference between each employee's salary and the average salary of their department.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary,
+       salary - AVG(salary) OVER (PARTITION BY department_id) AS salary_diff_from_avg
+FROM employees;
+</pre></li><li><p><strong>List employees whose salary is in the top 10% within their department.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary
+FROM (
+  SELECT department_id, first_name, last_name, salary,
+         NTILE(10) OVER (PARTITION BY department_id ORDER BY salary DESC) AS salary_percentile
+  FROM employees
+) AS ranked_salaries
+WHERE salary_percentile = 1;
+</pre></li><li><p><strong>Find the total number of employees in each department and the running total across all departments.</strong></p><pre class="prettyprint linenums">SELECT department_id, COUNT(*) AS num_employees,
+       SUM(COUNT(*)) OVER (ORDER BY department_id) AS running_total
+FROM employees
+GROUP BY department_id;
+</pre></li><li><p><strong>Retrieve employees who have the maximum salary in their department and rank their departments by average salary.</strong></p><pre class="prettyprint linenums">WITH DeptAvgSalary AS (
+  SELECT department_id, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY department_id
+)
+SELECT e.first_name, e.last_name, e.salary, das.department_id
+FROM employees e
+JOIN DeptAvgSalary das ON e.department_id = das.department_id
+WHERE e.salary = (SELECT MAX(salary) FROM employees WHERE department_id = e.department_id)
+ORDER BY das.avg_salary DESC;
+</pre></li><li><p><strong>List employees with their cumulative work experience in years, considering job history.</strong></p><pre class="prettyprint linenums">SELECT employee_id, first_name, last_name,
+       SUM(DATEDIFF(end_date, start_date)) / 365.0 AS cumulative_experience_years
+FROM job_history
+GROUP BY employee_id;
+</pre></li><li><p><strong>Find the rank of each employee's salary within the company as a whole.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, salary,
+       RANK() OVER (ORDER BY salary DESC) AS company_salary_rank
+FROM employees;
+</pre></li><li><p><strong>Retrieve the departments with the greatest variance in salaries using a window function.</strong></p><pre class="prettyprint linenums">SELECT department_id,
+       VARIANCE(salary) OVER (PARTITION BY department_id) AS salary_variance
+FROM employees
+GROUP BY department_id;
+</pre></li><li><p><strong>List employees who have received the maximum number of raises during their tenure.</strong></p><pre class="prettyprint linenums">WITH SalaryChanges AS (
+  SELECT employee_id, COUNT(*) AS num_raises
+  FROM job_history
+  WHERE salary != LAG(salary) OVER (PARTITION BY employee_id ORDER BY start_date)
+  GROUP BY employee_id
+)
+SELECT e.first_name, e.last_name, sc.num_raises
+FROM employees e
+JOIN SalaryChanges sc ON e.employee_id = sc.employee_id
+WHERE sc.num_raises = (SELECT MAX(num_raises) FROM SalaryChanges);
+</pre></li><li><p><strong>Calculate the percentage of total company salary that each department contributes.</strong></p><pre class="prettyprint linenums">SELECT department_id, SUM(salary) / (SELECT SUM(salary) FROM employees) * 100 AS department_salary_percentage
+FROM employees
+GROUP BY department_id;
+</pre></li><li><p><strong>Find the median salary within each department using a window function.</strong></p><pre class="prettyprint linenums">SELECT department_id, first_name, last_name, salary
+FROM (
+  SELECT department_id, first_name, last_name, salary,
+         NTILE(2) OVER (PARTITION BY department_id ORDER BY salary) AS salary_median_rank
+  FROM employees
+) AS ranked_salaries
+WHERE salary_median_rank IN (1, 2)
+ORDER BY department_id, salary;
+</pre></li><li><p><strong>Retrieve employees with the shortest tenure in the company.</strong></p><pre class="prettyprint linenums">SELECT first_name, last_name, hire_date
+FROM employees
+ORDER BY hire_date DESC
+LIMIT 1;
+</pre></li><li><p><strong>List all employees who have never worked under the same manager twice.</strong></p><pre class="prettyprint linenums">SELECT employee_id
+FROM job_history
+GROUP BY employee_id, manager_id
+HAVING COUNT(manager_id) = 1;</pre></li><li><p><strong>Find the top 5 departments with the highest average salary.</strong></p><pre class="prettyprint linenums">SELECT department_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id
+ORDER BY avg_salary DESC
+LIMIT 5;</pre></li><li><p><strong>Retrieve the second highest salary in the company.</strong></p><pre class="prettyprint linenums">SELECT MAX(salary) AS second_highest_salary
+FROM employees
+WHERE salary &lt; (SELECT MAX(salary) FROM employees);</pre></li><li><p><strong>List the names of employees who were hired in the same month and year as their managers.</strong></p><pre class="prettyprint linenums">SELECT e.first_name, e.last_name
+FROM employees e
+JOIN employees m ON e.manager_id = m.employee_id
+WHERE MONTH(e.hire_date) = MONTH(m.hire_date)
+  AND YEAR(e.hire_date) = YEAR(m.hire_date);</pre></li></ol>

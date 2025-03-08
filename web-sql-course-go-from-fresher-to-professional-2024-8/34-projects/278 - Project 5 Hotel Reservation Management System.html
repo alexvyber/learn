@@ -1,0 +1,254 @@
+<h4><strong>Project: Hotel Reservation Management System</strong></h4><p><br></p><p>The system will manage:</p><ol><li><p><strong>Guests</strong> – Information about guests who stay at the hotel.</p></li><li><p><strong>Rooms</strong> – Details of rooms available in the hotel.</p></li><li><p><strong>Reservations</strong> – Information about room bookings made by guests.</p></li><li><p><strong>Billing</strong> – Details of charges incurred during the stay.</p></li></ol><p><br></p><h4><strong>Database Schema</strong></h4><ol><li><p><strong>Guests Table</strong></p><ul><li><p><code>guest_id</code> (Primary Key, INT, Auto Increment)</p></li><li><p><code>first_name</code> (VARCHAR)</p></li><li><p><code>last_name</code> (VARCHAR)</p></li><li><p><code>phone</code> (VARCHAR)</p></li><li><p><code>email</code> (VARCHAR)</p></li><li><p><code>address</code> (VARCHAR)</p></li></ul></li><li><p><strong>Rooms Table</strong></p><ul><li><p><code>room_id</code> (Primary Key, INT, Auto Increment)</p></li><li><p><code>room_number</code> (VARCHAR, Unique)</p></li><li><p><code>room_type</code> (VARCHAR) – e.g., Single, Double, Suite</p></li><li><p><code>price_per_night</code> (DECIMAL)</p></li><li><p><code>status</code> (VARCHAR) – e.g., Available, Occupied, Under Maintenance</p></li></ul></li><li><p><strong>Reservations Table</strong></p><ul><li><p><code>reservation_id</code> (Primary Key, INT, Auto Increment)</p></li><li><p><code>guest_id</code> (Foreign Key, INT)</p></li><li><p><code>room_id</code> (Foreign Key, INT)</p></li><li><p><code>check_in_date</code> (DATE)</p></li><li><p><code>check_out_date</code> (DATE)</p></li><li><p><code>total_amount</code> (DECIMAL)</p></li><li><p><code>status</code> (VARCHAR) – e.g., Confirmed, Checked-in, Checked-out, Cancelled</p></li></ul></li><li><p><strong>Billing Table</strong></p><ul><li><p><code>billing_id</code> (Primary Key, INT, Auto Increment)</p></li><li><p><code>reservation_id</code> (Foreign Key, INT)</p></li><li><p><code>billing_date</code> (DATE)</p></li><li><p><code>amount</code> (DECIMAL)</p></li><li><p><code>payment_method</code> (VARCHAR) – e.g., Cash, Credit Card, Debit Card</p></li></ul></li></ol><p><br></p><h4><strong>SQL Queries</strong></h4><ol><li><p><strong>Create Tables</strong></p></li></ol><pre class="prettyprint linenums">CREATE TABLE Guests (
+    guest_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    address VARCHAR(255)
+);
+
+CREATE TABLE Rooms (
+    room_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_number VARCHAR(10) UNIQUE NOT NULL,
+    room_type VARCHAR(20),
+    price_per_night DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'Available'
+);
+
+CREATE TABLE Reservations (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT,
+    room_id INT,
+    check_in_date DATE NOT NULL,
+    check_out_date DATE NOT NULL,
+    total_amount DECIMAL(10, 2),
+    status VARCHAR(20) DEFAULT 'Confirmed',
+    FOREIGN KEY (guest_id) REFERENCES Guests(guest_id),
+    FOREIGN KEY (room_id) REFERENCES Rooms(room_id)
+);
+
+CREATE TABLE Billing (
+    billing_id INT AUTO_INCREMENT PRIMARY KEY,
+    reservation_id INT,
+    billing_date DATE NOT NULL,
+    amount DECIMAL(10, 2),
+    payment_method VARCHAR(20),
+    FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id)
+);
+</pre><p><br></p><ol start="2"><li><p><strong>Insert Sample Data</strong></p></li></ol><pre class="prettyprint linenums">-- Insert guests
+INSERT INTO Guests (first_name, last_name, phone, email, address) VALUES
+('John', 'Doe', '555-1234', 'john.doe@example.com', '123 Elm St'),
+('Jane', 'Smith', '555-5678', 'jane.smith@example.com', '456 Oak St');
+
+-- Insert rooms
+INSERT INTO Rooms (room_number, room_type, price_per_night, status) VALUES
+('101', 'Single', 75.00, 'Available'),
+('102', 'Double', 120.00, 'Available'),
+('201', 'Suite', 200.00, 'Occupied');
+
+-- Insert reservations
+INSERT INTO Reservations (guest_id, room_id, check_in_date, check_out_date, total_amount, status) VALUES
+(1, 101, '2024-08-01', '2024-08-05', 300.00, 'Checked-in'),
+(2, 102, '2024-08-10', '2024-08-15', 600.00, 'Confirmed');
+
+-- Insert billing
+INSERT INTO Billing (reservation_id, billing_date, amount, payment_method) VALUES
+(1, '2024-08-01', 300.00, 'Credit Card'),
+(2, '2024-08-10', 600.00, 'Cash');
+</pre><p><br></p><ol start="3"><li><p><strong>Sample Queries</strong></p></li></ol><ul><li><p><strong>Retrieve all available rooms:</strong></p></li></ul><pre class="prettyprint linenums">SELECT * FROM Rooms WHERE status = 'Available';
+</pre><p><br></p><ul><li><p><strong>Get all reservations for a specific guest:</strong></p></li></ul><pre class="prettyprint linenums">SELECT * FROM Reservations WHERE guest_id = 1;
+</pre><p><br></p><ul><li><p><strong>Calculate the total revenue for a given month:</strong></p></li></ul><pre class="prettyprint linenums">SELECT SUM(amount) AS total_revenue
+FROM Billing
+WHERE billing_date BETWEEN '2024-08-01' AND '2024-08-31';
+</pre><p><br></p><ul><li><p><strong>Update room status after check-out:</strong></p></li></ul><pre class="prettyprint linenums">UPDATE Rooms
+SET status = 'Available'
+WHERE room_id = 201;
+</pre><p><br></p><ul><li><p><strong>Delete a reservation:</strong></p></li></ul><pre class="prettyprint linenums">DELETE FROM Reservations
+WHERE reservation_id = 2;</pre><p><br></p><h4><strong>Advanced Queries</strong></h4><p><strong>1. Find the most expensive room type:</strong></p><pre class="prettyprint linenums">SELECT room_type, MAX(price_per_night) AS highest_price
+FROM Rooms
+GROUP BY room_type;
+</pre><p><br></p><p><strong>2. Get the average nightly rate of rooms by type:</strong></p><pre class="prettyprint linenums">SELECT room_type, AVG(price_per_night) AS average_price
+FROM Rooms
+GROUP BY room_type;
+</pre><p><br></p><p><strong>3. List guests who have multiple reservations:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, COUNT(r.reservation_id) AS number_of_reservations
+FROM Guests g
+JOIN Reservations r ON g.guest_id = r.guest_id
+GROUP BY g.guest_id
+HAVING COUNT(r.reservation_id) &gt; 1;
+</pre><p><br></p><p><strong>4. Retrieve reservations and billing details for a specific date range:</strong></p><pre class="prettyprint linenums">SELECT r.reservation_id, g.first_name, g.last_name, r.check_in_date, r.check_out_date, b.amount, b.payment_method
+FROM Reservations r
+JOIN Guests g ON r.guest_id = g.guest_id
+JOIN Billing b ON r.reservation_id = b.reservation_id
+WHERE r.check_in_date BETWEEN '2024-08-01' AND '2024-08-31';
+</pre><p><br></p><p><strong>5. Find guests with unpaid bills:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, b.amount
+FROM Guests g
+JOIN Reservations r ON g.guest_id = r.guest_id
+JOIN Billing b ON r.reservation_id = b.reservation_id
+WHERE b.amount &gt; 0 AND r.status != 'Checked-out';
+</pre><p><br></p><p><strong>6. Count the number of reservations by room type:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, COUNT(res.reservation_id) AS reservations_count
+FROM Reservations res
+JOIN Rooms r ON res.room_id = r.room_id
+GROUP BY r.room_type;
+</pre><p><br></p><p><strong>7. Find the total amount earned per room type:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, SUM(b.amount) AS total_earned
+FROM Billing b
+JOIN Reservations res ON b.reservation_id = res.reservation_id
+JOIN Rooms r ON res.room_id = r.room_id
+GROUP BY r.room_type;
+</pre><p><br></p><p><strong>8. Get a summary of reservations by status:</strong></p><pre class="prettyprint linenums">SELECT status, COUNT(reservation_id) AS count
+FROM Reservations
+GROUP BY status;
+</pre><p><br></p><p><strong>9. Find the room with the highest revenue generated:</strong></p><pre class="prettyprint linenums">SELECT r.room_number, SUM(b.amount) AS total_revenue
+FROM Rooms r
+JOIN Reservations res ON r.room_id = res.room_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY r.room_number
+ORDER BY total_revenue DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>10. Retrieve details of the most recent reservation for each guest:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, res.reservation_id, res.check_in_date, res.check_out_date
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+WHERE res.check_in_date = (
+    SELECT MAX(res2.check_in_date)
+    FROM Reservations res2
+    WHERE res2.guest_id = g.guest_id
+);
+</pre><p><br></p><p><strong>11. Get the total number of rooms available and occupied:</strong></p><pre class="prettyprint linenums">SELECT
+    SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS available_rooms,
+    SUM(CASE WHEN status = 'Occupied' THEN 1 ELSE 0 END) AS occupied_rooms
+FROM Rooms;
+</pre><p><br></p><p><strong>12. Find all reservations for a specific room number:</strong></p><pre class="prettyprint linenums">SELECT res.reservation_id, g.first_name, g.last_name, res.check_in_date, res.check_out_date, res.total_amount
+FROM Reservations res
+JOIN Rooms r ON res.room_id = r.room_id
+JOIN Guests g ON res.guest_id = g.guest_id
+WHERE r.room_number = '101';
+</pre><p><br></p><p><strong>13. List guests who stayed at the hotel for more than a week:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, DATEDIFF(r.check_out_date, r.check_in_date) AS stay_duration FROM Guests g
+JOIN Reservations r ON g.guest_id = r.guest_id
+WHERE DATEDIFF(r.check_out_date, r.check_in_date) &gt; 7;
+</pre><p><br></p><p><strong>14. Find the average stay duration for all reservations:</strong></p><pre class="prettyprint linenums">SELECT AVG(DATEDIFF(check_out_date, check_in_date)) AS average_stay_duration
+FROM Reservations;
+</pre><p><br></p><p><strong>15. Retrieve the details of reservations that overlap with a specific date range:</strong></p><pre class="prettyprint linenums">SELECT r.reservation_id, g.first_name, g.last_name, res.check_in_date, res.check_out_date
+FROM Reservations res
+JOIN Guests g ON res.guest_id = g.guest_id
+WHERE res.check_in_date &lt;= '2024-08-15' AND res.check_out_date &gt;= '2024-08-05';
+</pre><p><br></p><p><strong>16. Get a list of rooms with their last reservation date:</strong></p><pre class="prettyprint linenums">SELECT r.room_number, MAX(res.check_in_date) AS last_reservation_date
+FROM Rooms r
+LEFT JOIN Reservations res ON r.room_id = res.room_id
+GROUP BY r.room_number;
+</pre><p><br></p><p><strong>17. List all guests who have never made a reservation:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name
+FROM Guests g
+LEFT JOIN Reservations r ON g.guest_id = r.guest_id
+WHERE r.reservation_id IS NULL;
+</pre><p><br></p><p><strong>18. Find the total revenue for each guest:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, SUM(b.amount) AS total_revenue
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY g.guest_id;
+</pre><p><br></p><p><strong>19. Retrieve the most frequently booked room type:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, COUNT(res.reservation_id) AS booking_count
+FROM Reservations res
+JOIN Rooms r ON res.room_id = r.room_id
+GROUP BY r.room_type
+ORDER BY booking_count DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>20. Get a list of guests who have made reservations in the last month:</strong></p><pre class="prettyprint linenums">SELECT DISTINCT g.first_name, g.last_name
+FROM Guests g
+JOIN Reservations r ON g.guest_id = r.guest_id
+WHERE r.check_in_date &gt;= CURDATE() - INTERVAL 1 MONTH;
+</pre><p><br></p><p><strong>21. Find the total amount billed by room type for the last year:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, SUM(b.amount) AS total_billed
+FROM Billing b
+JOIN Reservations res ON b.reservation_id = res.reservation_id
+JOIN Rooms r ON res.room_id = r.room_id
+WHERE b.billing_date &gt;= CURDATE() - INTERVAL 1 YEAR
+GROUP BY r.room_type;
+</pre><p><br></p><p><strong>22. List all reservations that have not been billed yet:</strong></p><pre class="prettyprint linenums">SELECT res.reservation_id, g.first_name, g.last_name, res.check_in_date, res.check_out_date
+FROM Reservations res
+JOIN Guests g ON res.guest_id = g.guest_id
+LEFT JOIN Billing b ON res.reservation_id = b.reservation_id
+WHERE b.billing_id IS NULL;
+</pre><p><br></p><p><strong>23. Find the highest amount paid by a single guest:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, MAX(b.amount) AS highest_payment
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY g.guest_id;
+</pre><p><br></p><p><strong>24. Retrieve the total revenue generated by each room number:</strong></p><pre class="prettyprint linenums">SELECT r.room_number, SUM(b.amount) AS total_revenue
+FROM Rooms r
+JOIN Reservations res ON r.room_id = res.room_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY r.room_number;
+</pre><p><br></p><p><strong>25. Find the number of reservations for each status type:</strong></p><pre class="prettyprint linenums">SELECT status, COUNT(reservation_id) AS count
+FROM Reservations
+GROUP BY status;</pre><p><br></p><p><strong>26. Find the guest who has made the most reservations:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, COUNT(res.reservation_id) AS reservation_count
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+GROUP BY g.guest_id
+ORDER BY reservation_count DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>27. Retrieve the total revenue and number of nights stayed for each room type:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, SUM(DATEDIFF(res.check_out_date, res.check_in_date)) AS total_nights_stayed, SUM(b.amount) AS total_revenue
+FROM Reservations res
+JOIN Rooms r ON res.room_id = r.room_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY r.room_type;
+</pre><p><br></p><p><strong>28. List all guests who have stayed in a suite:</strong></p><pre class="prettyprint linenums">SELECT DISTINCT g.first_name, g.last_name
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+JOIN Rooms r ON res.room_id = r.room_id
+WHERE r.room_type = 'Suite';
+</pre><p><br></p><p><strong>28. Get the average number of nights per reservation:</strong></p><pre class="prettyprint linenums">SELECT AVG(DATEDIFF(check_out_date, check_in_date)) AS average_nights
+FROM Reservations;
+</pre><p><br></p><p><strong>29. Find the total number of reservations made per month:</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(check_in_date, '%Y-%m') AS month, COUNT(reservation_id) AS reservation_count
+FROM Reservations
+GROUP BY month
+ORDER BY month;
+</pre><p><br></p><p><strong>30. Get the list of rooms that have been booked more than a specified number of times:</strong></p><pre class="prettyprint linenums">SELECT r.room_number, COUNT(res.reservation_id) AS booking_count
+FROM Rooms r
+JOIN Reservations res ON r.room_id = res.room_id
+GROUP BY r.room_number
+HAVING booking_count &gt; 5;
+</pre><p><br></p><p><strong>31. Find the highest amount billed for a single reservation:</strong></p><pre class="prettyprint linenums">SELECT res.reservation_id, MAX(b.amount) AS highest_billed_amount
+FROM Reservations res
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY res.reservation_id
+ORDER BY highest_billed_amount DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>32. List all reservations that overlap with a specific reservation’s dates:</strong></p><pre class="prettyprint linenums">SELECT r1.reservation_id, g.first_name, g.last_name, r1.check_in_date, r1.check_out_date
+FROM Reservations r1
+JOIN Guests g ON r1.guest_id = g.guest_id
+WHERE EXISTS (
+    SELECT 1
+    FROM Reservations r2
+    WHERE r2.room_id = r1.room_id
+    AND r2.check_in_date &lt; '2024-08-10'
+    AND r2.check_out_date &gt; '2024-08-01'
+);
+</pre><p><br></p><p><strong>33. Get the total revenue from guests with a specific email domain:</strong></p><pre class="prettyprint linenums">SELECT SUM(b.amount) AS total_revenue
+FROM Billing b
+JOIN Reservations res ON b.reservation_id = res.reservation_id
+JOIN Guests g ON res.guest_id = g.guest_id
+WHERE g.email LIKE '%@example.com';
+</pre><p><br></p><p><strong>34. Retrieve the number of reservations for each room type by month:</strong></p><pre class="prettyprint linenums">SELECT r.room_type, DATE_FORMAT(res.check_in_date, '%Y-%m') AS month, COUNT(res.reservation_id) AS reservation_count
+FROM Reservations res
+JOIN Rooms r ON res.room_id = r.room_id
+GROUP BY r.room_type, month
+ORDER BY r.room_type, month;</pre><p><br></p><p><strong>35. Find the guest who spent the most on a single stay:</strong></p><pre class="prettyprint linenums">SELECT g.first_name, g.last_name, res.reservation_id, SUM(b.amount) AS total_spent
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+JOIN Billing b ON res.reservation_id = b.reservation_id
+GROUP BY g.guest_id, res.reservation_id
+ORDER BY total_spent DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>36. Get a list of all guests who have had at least one reservation in a particular room number:</strong></p><pre class="prettyprint linenums">SELECT DISTINCT g.first_name, g.last_name
+FROM Guests g
+JOIN Reservations res ON g.guest_id = res.guest_id
+JOIN Rooms r ON res.room_id = r.room_id
+WHERE r.room_number = '102';
+</pre><p><br></p><p><strong>37. Retrieve the most frequent check-in day of the week:</strong></p><pre class="prettyprint linenums">SELECT DAYNAME(check_in_date) AS day_of_week, COUNT(reservation_id) AS reservation_count
+FROM Reservations
+GROUP BY day_of_week
+ORDER BY reservation_count DESC
+LIMIT 1;
+</pre><p><br></p><p><strong>38. Find the total revenue generated from reservations that were cancelled:</strong></p><pre class="prettyprint linenums">SELECT SUM(b.amount) AS total_revenue
+FROM Reservations r
+JOIN Billing b ON r.reservation_id = b.reservation_id
+WHERE r.status = 'Cancelled';
+</pre><p><br></p><p><strong>39. Get the number of rooms by status:</strong></p><pre class="prettyprint linenums">SELECT status, COUNT(room_id) AS room_count
+FROM Rooms
+GROUP BY status;</pre>

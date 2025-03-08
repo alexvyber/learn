@@ -1,0 +1,249 @@
+<h4><strong>Project: Online Bookstore Management System</strong></h4><p><br></p><p>Develop a database for managing an online bookstore that can handle book inventories, customer orders, and staff management.</p><p><br></p><h4><strong>1. Requirements Analysis</strong></h4><ul><li><p><strong>Functional Requirements:</strong></p><ul><li><p>Store information about books (title, author, genre, price, etc.)</p></li><li><p>Manage customer information (name, contact details, address, etc.)</p></li><li><p>Process customer orders (order details, order status, payment information, etc.)</p></li><li><p>Track staff information and their roles</p></li></ul></li><li><p><strong>Non-Functional Requirements:</strong></p><ul><li><p>Database should handle up to 10,000 books and 5,000 customers.</p></li><li><p>Provide secure access to sensitive data.</p></li><li><p>Ensure data consistency and integrity.</p><p><br></p></li></ul></li></ul><h4><strong>2. Database Design</strong></h4><p><strong>a. Entities and Attributes</strong></p><ol><li><p><strong>Books</strong></p><ul><li><p><code>BookID</code> (Primary Key)</p></li><li><p><code>Title</code></p></li><li><p><code>Author</code></p></li><li><p><code>Genre</code></p></li><li><p><code>Price</code></p></li><li><p><code>StockQuantity</code></p></li><li><p><code>Publisher</code></p></li><li><p><code>PublishedDate</code></p></li></ul></li><li><p><strong>Customers</strong></p><ul><li><p><code>CustomerID</code> (Primary Key)</p></li><li><p><code>FirstName</code></p></li><li><p><code>LastName</code></p></li><li><p><code>Email</code></p></li><li><p><code>Phone</code></p></li><li><p><code>Address</code></p></li><li><p><code>City</code></p></li><li><p><code>State</code></p></li><li><p><code>ZipCode</code></p></li></ul></li><li><p><strong>Orders</strong></p><ul><li><p><code>OrderID</code> (Primary Key)</p></li><li><p><code>CustomerID</code> (Foreign Key)</p></li><li><p><code>OrderDate</code></p></li><li><p><code>TotalAmount</code></p></li><li><p><code>OrderStatus</code></p></li></ul></li><li><p><strong>OrderDetails</strong></p><ul><li><p><code>OrderDetailID</code> (Primary Key)</p></li><li><p><code>OrderID</code> (Foreign Key)</p></li><li><p><code>BookID</code> (Foreign Key)</p></li><li><p><code>Quantity</code></p></li><li><p><code>PriceAtPurchase</code></p></li></ul></li><li><p><strong>Staff</strong></p><ul><li><p><code>StaffID</code> (Primary Key)</p></li><li><p><code>FirstName</code></p></li><li><p><code>LastName</code></p></li><li><p><code>Position</code></p></li><li><p><code>HireDate</code></p></li><li><p><code>Salary</code></p></li></ul></li></ol><p><strong>b. Relationships</strong></p><ul><li><p>A customer can place multiple orders.</p></li><li><p>Each order can contain multiple books.</p></li><li><p>Each book can appear in multiple orders.</p></li></ul><p><br></p><h4><strong>3. SQL Schema</strong></h4><p><strong>a. Creating Tables</strong></p><pre class="prettyprint linenums">CREATE TABLE Books (
+    BookID INT PRIMARY KEY AUTO_INCREMENT,
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255),
+    Genre VARCHAR(100),
+    Price DECIMAL(10, 2) NOT NULL,
+    StockQuantity INT DEFAULT 0,
+    Publisher VARCHAR(255),
+    PublishedDate DATE
+);
+
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Phone VARCHAR(15),
+    Address VARCHAR(255),
+    City VARCHAR(100),
+    State VARCHAR(100),
+    ZipCode VARCHAR(10)
+);
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    OrderDate DATE NOT NULL,
+    TotalAmount DECIMAL(10, 2),
+    OrderStatus VARCHAR(50),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderDetails (
+    OrderDetailID INT PRIMARY KEY AUTO_INCREMENT,
+    OrderID INT,
+    BookID INT,
+    Quantity INT,
+    PriceAtPurchase DECIMAL(10, 2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (BookID) REFERENCES Books(BookID)
+);
+
+CREATE TABLE Staff (
+    StaffID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    Position VARCHAR(100),
+    HireDate DATE NOT NULL,
+    Salary DECIMAL(10, 2)
+);
+</pre><p><br></p><p><strong>b. Sample Data Insertion</strong></p><pre class="prettyprint linenums">-- Adding some books
+INSERT INTO Books (Title, Author, Genre, Price, StockQuantity, Publisher, PublishedDate)
+VALUES ('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', 10.99, 100, 'Scribner', '1925-04-10'),
+       ('To Kill a Mockingbird', 'Harper Lee', 'Fiction', 7.99, 150, 'J.B. Lippincott &amp; Co.', '1960-07-11');
+
+-- Adding a customer
+INSERT INTO Customers (FirstName, LastName, Email, Phone, Address, City, State, ZipCode)
+VALUES ('John', 'Doe', 'john.doe@example.com', '555-1234', '123 Elm Street', 'Springfield', 'IL', '62701');
+
+-- Adding an order
+INSERT INTO Orders (CustomerID, OrderDate, TotalAmount, OrderStatus)
+VALUES (1, '2024-08-25', 18.98, 'Completed');
+
+-- Adding order details
+INSERT INTO OrderDetails (OrderID, BookID, Quantity, PriceAtPurchase)
+VALUES (1, 1, 1, 10.99),
+       (1, 2, 1, 7.99);
+
+-- Adding a staff member
+INSERT INTO Staff (FirstName, LastName, Position, HireDate, Salary)
+VALUES ('Alice', 'Smith', 'Manager', '2024-01-15', 55000.00);
+</pre><p><br></p><h4><strong>4. Queries</strong></h4><p><strong>a. Retrieve all books</strong></p><pre class="prettyprint linenums">SELECT * FROM Books;
+</pre><p><br></p><p><strong>b. Get details of a specific customer’s orders</strong></p><pre class="prettyprint linenums">SELECT o.OrderID, o.OrderDate, b.Title, od.Quantity, od.PriceAtPurchase
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+JOIN Books b ON od.BookID = b.BookID
+WHERE o.CustomerID = 1;
+</pre><p><br></p><p><strong>c. Update book stock</strong></p><pre class="prettyprint linenums">UPDATE Books
+SET StockQuantity = StockQuantity - 1
+WHERE BookID = 1;
+</pre><p><br></p><p><strong>d. Delete an order</strong></p><pre class="prettyprint linenums">DELETE FROM Orders
+WHERE OrderID = 1;
+</pre><p><br></p><h4><strong>1. Aggregated Data</strong></h4><p><strong>a. Total Sales for a Specific Book</strong></p><pre class="prettyprint linenums">SELECT b.Title, SUM(od.Quantity * od.PriceAtPurchase) AS TotalSales
+FROM OrderDetails od
+JOIN Books b ON od.BookID = b.BookID
+WHERE b.Title = 'The Great Gatsby'
+GROUP BY b.Title;
+</pre><p><br></p><p><strong>b. Total Sales by Genre</strong></p><pre class="prettyprint linenums">SELECT b.Genre, SUM(od.Quantity * od.PriceAtPurchase) AS TotalSales
+FROM OrderDetails od
+JOIN Books b ON od.BookID = b.BookID
+GROUP BY b.Genre;
+</pre><p><br></p><p><strong>c. Number of Orders per Customer</strong></p><pre class="prettyprint linenums">SELECT c.FirstName, c.LastName, COUNT(o.OrderID) AS NumberOfOrders
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName, c.LastName;
+</pre><p><br></p><h4><strong>2. Customer Insights</strong></h4><p><strong>a. Find Customers with Orders Over a Certain Amount</strong></p><pre class="prettyprint linenums">SELECT c.FirstName, c.LastName, SUM(o.TotalAmount) AS TotalSpent
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName, c.LastName
+HAVING SUM(o.TotalAmount) &gt; 100;
+</pre><p><br></p><p><strong>b. Find Customers with No Orders</strong></p><pre class="prettyprint linenums">SELECT c.FirstName, c.LastName
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE o.OrderID IS NULL;
+</pre><p><br></p><h4><strong>3. Book Inventory</strong></h4><p><strong>a. Books Below a Certain Stock Level</strong></p><pre class="prettyprint linenums">SELECT Title, Author, StockQuantity
+FROM Books
+WHERE StockQuantity &lt; 10;
+</pre><p><br></p><p><strong>b. Update Book Price</strong></p><pre class="prettyprint linenums">UPDATE Books
+SET Price = Price * 1.10  -- Increase price by 10%
+WHERE Genre = 'Fiction';
+</pre><p><br></p><h4><strong>4. Order Management</strong></h4><p><strong>a. List All Orders with Details</strong></p><pre class="prettyprint linenums">SELECT o.OrderID, o.OrderDate, c.FirstName, c.LastName, b.Title, od.Quantity, od.PriceAtPurchase
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+JOIN Books b ON od.BookID = b.BookID
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+</pre><p><br></p><p><strong>b. Find Orders with a Specific Status</strong></p><pre class="prettyprint linenums">SELECT o.OrderID, c.FirstName, c.LastName, o.TotalAmount
+FROM Orders o
+JOIN Customers c ON o.CustomerID = c.CustomerID
+WHERE o.OrderStatus = 'Pending';
+</pre><p><br></p><p><strong>c. Cancel an Order</strong></p><pre class="prettyprint linenums">-- Mark the order as cancelled
+UPDATE Orders
+SET OrderStatus = 'Cancelled'
+WHERE OrderID = 1;
+
+-- Adjust stock quantity for cancelled orders
+UPDATE Books b
+JOIN OrderDetails od ON b.BookID = od.BookID
+SET b.StockQuantity = b.StockQuantity + od.Quantity
+WHERE od.OrderID = 1;
+</pre><p><br></p><h4><strong>5. Staff Management</strong></h4><p><strong>a. Staff List with Total Sales They Have Processed</strong></p><pre class="prettyprint linenums">SELECT s.FirstName, s.LastName, SUM(o.TotalAmount) AS TotalSales
+FROM Staff s
+JOIN Orders o ON s.StaffID = o.StaffID  -- Assuming there is a StaffID in Orders table
+GROUP BY s.StaffID, s.FirstName, s.LastName;
+</pre><p><br></p><p><strong>b. Update Staff Salary</strong></p><pre class="prettyprint linenums">UPDATE Staff
+SET Salary = Salary * 1.05  -- Increase salary by 5%
+WHERE Position = 'Manager';
+</pre><p><br></p><p><strong>c. Find Staff Hired After a Specific Date</strong></p><pre class="prettyprint linenums">SELECT FirstName, LastName, Position, HireDate
+FROM Staff
+WHERE HireDate &gt; '2024-01-01';
+</pre><p><br></p><h4><strong>6. Advanced Queries</strong></h4><p><strong>a. Books That Have Never Been Ordered</strong></p><pre class="prettyprint linenums">SELECT Title, Author
+FROM Books b
+LEFT JOIN OrderDetails od ON b.BookID = od.BookID
+WHERE od.BookID IS NULL;
+</pre><p><br></p><p><strong>b. Top 5 Best-Selling Books</strong></p><pre class="prettyprint linenums">SELECT b.Title, SUM(od.Quantity) AS TotalQuantity
+FROM OrderDetails od
+JOIN Books b ON od.BookID = b.BookID
+GROUP BY b.Title
+ORDER BY TotalQuantity DESC
+LIMIT 5;
+</pre><p><br></p><p><strong>c. Monthly Sales Report</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(o.OrderDate, '%Y-%m') AS Month, SUM(o.TotalAmount) AS MonthlySales
+FROM Orders o
+GROUP BY DATE_FORMAT(o.OrderDate, '%Y-%m')
+ORDER BY Month;</pre><p><br></p><h4><strong>7. Advanced Data Analysis</strong></h4><p><strong>a. Average Order Value by Customer</strong></p><pre class="prettyprint linenums">SELECT c.CustomerID, c.FirstName, c.LastName, AVG(o.TotalAmount) AS AverageOrderValue
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName, c.LastName;
+</pre><p><br></p><p><strong>b. Top 3 Customers by Total Spending</strong></p><pre class="prettyprint linenums">SELECT c.CustomerID, c.FirstName, c.LastName, SUM(o.TotalAmount) AS TotalSpent
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName, c.LastName
+ORDER BY TotalSpent DESC
+LIMIT 3;
+</pre><p><br></p><p><strong>c. Monthly Book Sales by Genre</strong></p><pre class="prettyprint linenums">SELECT DATE_FORMAT(o.OrderDate, '%Y-%m') AS Month, b.Genre, SUM(od.Quantity) AS TotalSold
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+JOIN Books b ON od.BookID = b.BookID
+GROUP BY Month, b.Genre
+ORDER BY Month, b.Genre;
+</pre><p><br></p><h4><strong>8. Data Management and Maintenance</strong></h4><p><strong>a. Delete Old Orders (Older Than 2 Years)</strong></p><pre class="prettyprint linenums">DELETE FROM Orders
+WHERE OrderDate &lt; CURDATE() - INTERVAL 2 YEAR;
+</pre><p><br></p><p><strong>b. Update Stock Quantity After a New Shipment</strong></p><pre class="prettyprint linenums">UPDATE Books
+SET StockQuantity = StockQuantity + 50  -- Assuming a new shipment of 50 units for all books
+WHERE Genre = 'Science Fiction';
+</pre><p><br></p><p><strong>c. Identify Duplicate Customers (Based on Email)</strong></p><pre class="prettyprint linenums">SELECT Email, COUNT(*) AS NumOccurrences
+FROM Customers
+GROUP BY Email
+HAVING COUNT(*) &gt; 1;</pre><p><br></p><h4><strong>9. Customer Engagement and Retention</strong></h4><p><strong>a. Find Customers Who Haven't Ordered in the Last Year</strong></p><pre class="prettyprint linenums">SELECT c.CustomerID, c.FirstName, c.LastName
+FROM Customers c
+LEFT JOIN Orders o ON c.CustomerID = o.CustomerID AND o.OrderDate &gt; CURDATE() - INTERVAL 1 YEAR
+WHERE o.OrderID IS NULL;
+</pre><p><br></p><p><strong>b. Recommend Books to Customers Based on Past Purchases</strong></p><pre class="prettyprint linenums">SELECT DISTINCT c.CustomerID, c.FirstName, c.LastName, b.Title AS RecommendedBook
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+JOIN Books b ON od.BookID = b.BookID
+WHERE b.Genre IN (
+    SELECT Genre
+    FROM Books
+    WHERE BookID IN (
+        SELECT BookID
+        FROM OrderDetails
+        WHERE OrderID IN (
+            SELECT OrderID
+            FROM Orders
+            WHERE CustomerID = c.CustomerID
+        )
+    )
+)
+AND b.BookID NOT IN (
+    SELECT BookID
+    FROM OrderDetails
+    WHERE OrderID IN (
+        SELECT OrderID
+        FROM Orders
+        WHERE CustomerID = c.CustomerID
+    )
+);
+</pre><p><br></p><h4><strong>10. Financial Reporting</strong></h4><p><strong>a. Yearly Revenue and Profit Report</strong></p><p>Assuming there is a <code>Cost</code> column in the <code>Books</code> table representing the cost price of the book:</p><pre class="prettyprint linenums">SELECT YEAR(o.OrderDate) AS Year, 
+       SUM(od.Quantity * od.PriceAtPurchase) AS TotalRevenue,
+       SUM(od.Quantity * (od.PriceAtPurchase - b.Cost)) AS TotalProfit
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+JOIN Books b ON od.BookID = b.BookID
+GROUP BY Year;
+</pre><p><br></p><p><strong>b. Identify Underperforming Books (Books with No Sales in the Last Year)</strong></p><pre class="prettyprint linenums">SELECT b.BookID, b.Title, b.Author
+FROM Books b
+LEFT JOIN OrderDetails od ON b.BookID = od.BookID
+LEFT JOIN Orders o ON od.OrderID = o.OrderID AND o.OrderDate &gt; CURDATE() - INTERVAL 1 YEAR
+WHERE o.OrderID IS NULL;</pre><p><br></p><h4><strong>11. Operational Queries</strong></h4><p><strong>a. List Books by Stock Status (Low, Medium, High)</strong></p><pre class="prettyprint linenums">SELECT Title, 
+       CASE 
+           WHEN StockQuantity &lt; 10 THEN 'Low Stock'
+           WHEN StockQuantity BETWEEN 10 AND 50 THEN 'Medium Stock'
+           ELSE 'High Stock'
+       END AS StockStatus
+FROM Books;
+</pre><p><br></p><p><strong>b. Generate a Reorder Report for Books Low in Stock</strong></p><pre class="prettyprint linenums">SELECT BookID, Title, StockQuantity, (10 - StockQuantity) AS ReorderAmount
+FROM Books
+WHERE StockQuantity &lt; 10;
+</pre><p><br></p><p><strong>c. Calculate Total Salary Expenditure per Position</strong></p><pre class="prettyprint linenums">SELECT Position, SUM(Salary) AS TotalSalaryExpenditure
+FROM Staff
+GROUP BY Position;
+</pre><p><br></p><h4><strong>12. Miscellaneous Useful Queries</strong></h4><p><strong>a. Retrieve the Most Recent Order for Each Customer</strong></p><pre class="prettyprint linenums">SELECT c.CustomerID, c.FirstName, c.LastName, o.OrderID, o.OrderDate
+FROM Customers c
+JOIN Orders o ON c.CustomerID = o.CustomerID
+WHERE o.OrderDate = (
+    SELECT MAX(OrderDate)
+    FROM Orders
+    WHERE CustomerID = c.CustomerID
+);
+</pre><p><br></p><p><strong>b. List All Orders and Their Total Items</strong></p><pre class="prettyprint linenums">SELECT o.OrderID, o.OrderDate, SUM(od.Quantity) AS TotalItems
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+GROUP BY o.OrderID, o.OrderDate;
+</pre><p><br></p><p><strong>c. View the Order History of a Specific Customer by Date</strong></p><pre class="prettyprint linenums">SELECT o.OrderID, o.OrderDate, SUM(od.Quantity * od.PriceAtPurchase) AS OrderTotal
+FROM Orders o
+JOIN OrderDetails od ON o.OrderID = od.OrderID
+WHERE o.CustomerID = 1  -- Replace with specific CustomerID
+GROUP BY o.OrderID, o.OrderDate
+ORDER BY o.OrderDate DESC;</pre>
