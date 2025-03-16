@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  
+    <form id="form">
+        <input id="input"  />
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="stars">
+asd
+    </div>
+
+    <script>
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        const starts = document.getElementById('stars')
+
+   
+
+        async function handleSubmit(event){
+            if(!input || !form) {
+            throw new Error()
+        }
+            event.preventDefault()
+
+            const start = Date.now()
+
+            const res = await fetch('/repo', {
+                method: "POST",
+                body: JSON.stringify({
+                    repo: input.value,
+                })
+                
+            })
+
+            const end = Date.now()
+
+            const data = await res.json()
+            
+            console.log("🚀 ~ handleSubmit ~ data:", data)
+
+            console.log(end - start)
+
+            starts.innerText = data.stars
+
+
+
+        }
+
+        form.addEventListener("submit", handleSubmit)
+    </script>
+</body>
+</html>
